@@ -2,14 +2,46 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
+import henriqueRoutes from "./henrique";
 
 const server = express();
 server.use(express.json());
+server.use(cors());
+server.use("/", henriqueRoutes);
 
-interface historico {
-  data: Date;
-  descricao: string;
-  valor: number;
+const ROOT = path.resolve(__dirname, ".."); // sobe 1 nível: do src/ para a raiz
+
+// aceitar submit de <form> tradicional também
+server.use(express.urlencoded({ extended: true }));
+
+// tudo que está na raiz (index.html, cadastro.html, assets/...)
+server.use(express.static(ROOT));
+
+// página inicial = index.html da raiz
+server.get("/", (_req, res) => {
+  res.sendFile(path.join(ROOT, "index.html"));
+});
+
+export interface HistoricoItem {
+  data: string;        // Data da transação
+  descricao: string;   // Texto explicando o que aconteceu
+  valor: number;       // Valor positivo (crédito) ou negativo (débito)
+}
+
+export interface Favorito {
+  idEstacao: number;   // ID da estação favorita
+  nome: string;        // Nome da estação
+  linha: string;       // Linha correspondente
+}
+
+export interface Usuario {
+  id: number;                  // ID do usuário
+  username: string;            // Nome de login
+  email: string;               // E-mail do usuário
+  password: string;            // Senha (ou hash)
+  saldo: number;               // Saldo atual
+  historico: HistoricoItem[];  // Transações
+  favoritos: Favorito[];       // Estações favoritas
 }
 
 interface Login {
@@ -18,6 +50,7 @@ interface Login {
   email: string;
   senha: string;
 }
+
 interface Estacao {
   id: string;
   nome: string;
@@ -99,20 +132,118 @@ server.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, ".." , "mapa.html"));
 });
 
-let usuarios: Login[] = [];
-server.get("/proximoId", (req, res) => {
-  if (usuarios.length === 0) {
-    return res.json({ proximoId: 1 });
+// Caminho absoluto para o arquivo usuarios.json
+const usuariosFilePath = path.join(__dirname, 'usuarios.json');
+
+// Função auxiliar para ler os usuários do arquivo
+function carregarUsuarios() {
+  try {
+    const data = fs.readFileSync(usuariosFilePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Erro ao ler usuarios.json:', error);
+    return [];
+  }
+}
+
+// Função auxiliar para salvar os usuários de volta no arquivo
+function salvarUsuarios(usuarios: any) {
+  try {
+    fs.writeFileSync(usuariosFilePath, JSON.stringify(usuarios, null, 2));
+  } catch (error) {
+    console.error('Erro ao salvar usuarios.json:', error);
+  }
+}
+
+/**
+ * ROTA POST /login
+ * Autentica o usuário com base no arquivo usuarios.json
+ */
+server.post('/login', (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Informe username e password.' });
   }
 
-  const ultimoUsuario = usuarios[usuarios.length - 1];
-  const proximoId = ultimoUsuario.id + 1;
+  const usuarios = carregarUsuarios();
+
+  // Procura usuário com o username e senha informados
+  const usuarioEncontrado = usuarios.find(
+    (u: any) => u.username === username && u.password === password
+  );
+
+  if (usuarioEncontrado) {
+    return res.status(200).json({
+      message: 'Login realizado com sucesso!',
+      usuario: {
+        id: usuarioEncontrado.id,
+        username: usuarioEncontrado.username,
+        email: usuarioEncontrado.email,
+        saldo: usuarioEncontrado.saldo,
+      },
+    });
+  } else {
+    return res.status(401).json({ message: 'Usuário ou senha incorretos.' });
+  }
+});
+
+/**
+ * ROTA PUT /tela-saldo
+ * - Recebe o userId e o valor da passagem
+ * - Subtrai do saldo atual
+ * - Atualiza o arquivo usuarios.json
+ * - Retorna o novo saldo
+ */
+
+// pra isso tudo funcionar, talvez tenhamos que adicionar um valor pra cada passagem, mas nao tenho certeza
+server.put('/tela-saldo', (req: Request, res: Response) => {
+  const { userId, valorPassagem } = req.body;
+
+  if (!userId || !valorPassagem) {
+    return res.status(400).json({ message: 'Informe userId e valorPassagem.' });
+  }
+
+  const usuarios = carregarUsuarios();
+  const usuario = usuarios.find((u: any) => u.id === userId);
+
+  if (!usuario) {
+    return res.status(404).json({ message: 'Usuário não encontrado.' });
+  }
+
+  if (usuario.saldo < valorPassagem) {
+    return res.status(400).json({ message: 'Saldo insuficiente para gerar bilhete.' });
+  }
+
+  // Subtrai o valor da passagem
+  usuario.saldo -= valorPassagem;
+
+  // Adiciona uma entrada no histórico
+  usuario.historico.push({
+    data: new Date().toISOString(),
+    descricao: 'Compra de bilhete',
+    valor: -valorPassagem,
+  });
+
+  // Salva de volta no arquivo
+  salvarUsuarios(usuarios);
+
+  return res.status(200).json({
+    message: 'Bilhete gerado com sucesso!',
+    novoSaldo: usuario.saldo,
+  });
+});
+
+server.get("/proximoId", (_req, res) => {
+  const usuarios = carregarUsuarios(); // <- do arquivo
+  const proximoId =
+    usuarios.length === 0 ? 1 : Math.max(...usuarios.map((u: any) => Number(u.id) || 0)) + 1;
 
   return res.json({ proximoId });
 });
 
 server.post("/usuarios", (req, res) => {
-  const { nome, email, senha } = req.body;
+  const { nome, email, senha } = req.body as { nome?: string; email?: string; senha?: string };
 
   if (!nome || !email || !senha) {
     return res.status(400).json({ erro: "nome, email e senha são obrigatórios." });
@@ -127,18 +258,39 @@ server.post("/usuarios", (req, res) => {
     return res.status(400).json({ erro: "senha deve ter pelo menos 6 caracteres." });
   }
 
-  const jaExiste = usuarios.some(u => u.email.toLowerCase() === email.toLowerCase());
+  // carrega do ARQUIVO
+  const usuarios = carregarUsuarios();
+
+  // checa duplicidade por email OU username (que será o 'nome')
+  const jaExiste = usuarios.some(
+    (u: any) =>
+      (u.email && String(u.email).toLowerCase() === email.toLowerCase()) ||
+      (u.username && String(u.username).toLowerCase() === nome.toLowerCase())
+  );
   if (jaExiste) {
-    return res.status(409).json({ erro: "email já cadastrado." });
+    return res.status(409).json({ erro: "email ou username já cadastrado." });
   }
 
-  const ultimoUsuario = usuarios[usuarios.length - 1];
-  const proximoId = ultimoUsuario ? ultimoUsuario.id + 1 : 1;
+  // calcula próximo id com segurança
+  const proximoId =
+    usuarios.length === 0 ? 1 : Math.max(...usuarios.map((u: any) => Number(u.id) || 0)) + 1;
 
-  const novoUsuario = { id: proximoId, nome, email, senha };
+  // monta o registro no formato esperado pelo /login
+  const novoUsuario = {
+    id: proximoId,
+    username: nome,
+    email,
+    password: senha,
+    saldo: 0,
+    historico: [] as Array<{ data: string; descricao: string; valor: number }>,
+    favoritos: [] as Array<{ idEstacao: number; nome: string; linha: string }>,
+  };
+
   usuarios.push(novoUsuario);
+  salvarUsuarios(usuarios);
 
-  const { senha: _omit, ...usuarioSemSenha } = novoUsuario;
+  // nunca devolva senha
+  const { password: _omit, ...usuarioSemSenha } = novoUsuario;
   return res.status(201).json(usuarioSemSenha);
 });
 

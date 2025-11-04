@@ -16,32 +16,13 @@
   <div id="modal" class="modal">
     <div class="modal-content">
       <h2>Bem-vindo à CPTM</h2>
-      <p>Login</p>
-      <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bem-vindo à CPTM</title>
-  <link rel="stylesheet" href="./assets/css/login-carregando.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet">
-</head>
-<body>
-  <div class="bg-zoom"></div>
-
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h2>Bem-vindo à CPTM</h2>
-      <p>Login</p>
-
-      <!-- ÚNICO FORM -->
-      <form id="login-form" novalidate>
-        <input type="email" id="email" placeholder="Insira seu e-mail" required />
-        <input type="password" id="senha" placeholder="Insira sua senha" required />
+      <p>Cadastro</p>
+<form id="cadastro-form" novalidate>
+        <input type="text" id="nome" placeholder="Nome" required />
+        <input type="email" id="email" placeholder="E-mail" required />
+        <input type="password" id="senha" placeholder="Crie sua senha (mín. 6 caracteres)" required />
         <button id="botao" type="submit">Continuar</button>
-        <button id="cadastro" type="button" onclick="window.location.href='cadastro.html'">Não tem uma conta? Cadastre-se</button>
+        <button id="voltar-login" type="button">Já tem conta? Fazer login</button>
       </form>
     </div>
 
@@ -50,7 +31,6 @@
       <p style="color:#f5f5f5; font-weight:bold;">Carregando...</p>
     </div>
   </div>
-
-  <script src="assets/js/login.js"></script>
+    <script src="assets/js/cadastro.js"></script>
 </body>
 </html>
