@@ -7,28 +7,10 @@
   <link rel="stylesheet" href="./assets/css/login-carregando.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Great+Vibes&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-</head>
-<body>
-
-  <div class="bg-zoom"></div>
-
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <h2>Bem-vindo à CPTM</h2>
-      <p>Login</p>
-      <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bem-vindo à CPTM</title>
-  <link rel="stylesheet" href="./assets/css/login-carregando.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..900&display=swap" rel="stylesheet">
 </head>
 <body>
+
   <div class="bg-zoom"></div>
 
   <div id="modal" class="modal">
@@ -36,12 +18,22 @@
       <h2>Bem-vindo à CPTM</h2>
       <p>Login</p>
 
-      <!-- ÚNICO FORM -->
+      <!-- Mensagem de erro -->
+      <p id="erro-login" style="
+        display:none;
+        color:#ffb3b3;
+        font-weight:bold;
+        text-align:center;
+        margin-bottom:10px;">
+      </p>
+
       <form id="login-form" novalidate>
         <input type="email" id="email" placeholder="Insira seu e-mail" required />
         <input type="password" id="senha" placeholder="Insira sua senha" required />
         <button id="botao" type="submit">Continuar</button>
-        <button id="cadastro" type="button" onclick="window.location.href='cadastro.html'">Não tem uma conta? Cadastre-se</button>
+        <button id="cadastro" type="button" onclick="window.location.href='cadastro.html'">
+          Não tem uma conta? Cadastre-se
+        </button>
       </form>
     </div>
 
@@ -51,6 +43,36 @@
     </div>
   </div>
 
-  <script src="assets/js/login.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const erroLogin = document.getElementById('erro-login');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value.trim();
+
+      try {
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: email, password: senha })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          erroLogin.textContent = data.message || 'Usuário ou senha inválidos.';
+          erroLogin.style.display = 'block';
+        } else {
+          erroLogin.style.display = 'none';
+          window.location.href = 'home.html';
+        }
+      } catch (err) {
+        erroLogin.textContent = 'Erro ao conectar com o servidor.';
+        erroLogin.style.display = 'block';
+      }
+    });
+  </script>
 </body>
 </html>

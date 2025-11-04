@@ -170,7 +170,9 @@ server.post('/login', (req: Request, res: Response) => {
 
   // Procura usuário com o username e senha informados
   const usuarioEncontrado = usuarios.find(
-    (u: any) => u.username === username && u.password === password
+    (u: any) =>
+      (u.username === username || u.email === username) &&
+      u.password === password
   );
 
   if (usuarioEncontrado) {

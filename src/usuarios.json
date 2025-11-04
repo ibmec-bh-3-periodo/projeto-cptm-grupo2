@@ -4,7 +4,7 @@
     "username": "Henrique",
     "email": "henrique@email.com",
     "password": "hashed_password_123",
-    "saldo": 257,
+    "saldo": 150.75,
     "historico": [
       {
         "data": "2024-10-01T10:15:30Z",
@@ -12,204 +12,36 @@
         "valor": 100
       },
       {
-        "data": "2025-10-24T14:27:46.356Z",
-        "descricao": "Recarga de saldo (+R$ 5.00)",
-        "valor": 5
+        "data": "2024-10-05T14:20:00Z",
+        "descricao": "Compra de bilhete",
+        "valor": -4.5
+      }
+    ],
+    "favoritos": [
+      {
+        "idEstacao": 1,
+        "nome": "Brás",
+        "linha": "10 - Turquesa"
       },
       {
-        "data": "2025-10-31T13:35:16.451Z",
-        "descricao": "Recarga de saldo (+R$ 5.00)",
-        "valor": 5
+        "idEstacao": 2,
+        "nome": "Luz",
+        "linha": "7 - Rubi"
       },
       {
-        "data": "2025-10-31T13:35:19.232Z",
-        "descricao": "Recarga de saldo (+R$ 2.00)",
-        "valor": 2
-      },
-      {
-        "data": "2025-10-31T13:35:21.480Z",
-        "descricao": "Recarga de saldo (+R$ 10.00)",
-        "valor": 10
-      },
-      {
-        "data": "2025-10-31T13:35:24.586Z",
-        "descricao": "Recarga de saldo (+R$ 20.00)",
-        "valor": 20
-      },
-      {
-        "data": "2025-10-31T13:36:18.832Z",
-        "descricao": "Recarga de saldo (+R$ 20.00)",
-        "valor": 20
-      },
-      {
-        "data": "2025-10-31T13:36:40.077Z",
-        "descricao": "Recarga de saldo (+R$ 20.00)",
-        "valor": 20
-      },
-      {
-        "data": "2025-10-31T13:36:42.223Z",
-        "descricao": "Recarga de saldo (+R$ 5.00)",
-        "valor": 5
-      },
-      {
-        "data": "2025-10-31T13:50:23.700Z",
-        "descricao": "Recarga de saldo (+R$ 20.00)",
-        "valor": 20
-      },
-      {
-        "data": "2025-10-31T13:56:53.419Z",
-        "descricao": "Recarga de saldo (+R$ 20.00)",
-        "valor": 20
-      },
-      {
-        "data": "2025-10-31T14:14:36.055Z",
-        "descricao": "Recarga de saldo (+R$ 10.00)",
-        "valor": 10
-      },
-      {
-        "data": "2025-10-31T14:25:42.465Z",
-        "descricao": "Recarga de saldo (+R$ 10.00)",
-        "valor": 10
-      },
-      {
-        "data": "2025-10-31T14:31:11.636Z",
-        "descricao": "Recarga de saldo (+R$ 10.00)",
-        "valor": 10
+        "idEstacao": 3,
+        "nome": "Pinheiros",
+        "linha": "9 - Esmeralda"
       }
     ]
   },
   {
     "id": 2,
-    "username": "Davi",
-    "email": "davi@email.com",
-    "password": "senha123",
-    "saldo": 90.5,
-    "historico": [
-      {
-        "data": "2024-09-28T09:30:00Z",
-        "descricao": "Recarga de saldo",
-        "valor": 50
-      },
-      {
-        "data": "2024-09-29T07:45:00Z",
-        "descricao": "Compra de bilhete: Osasco → Pinheiros",
-        "valor": -5
-      }
-    ],
-    "favoritos": [
-      {
-        "idEstacao": 3,
-        "nome": "Osasco",
-        "linha": "Linha 8 - Diamante"
-      },
-      {
-        "idEstacao": 4,
-        "nome": "Pinheiros",
-        "linha": "Linha 9 - Esmeralda"
-      }
-    ]
-  },
-  {
-    "id": 3,
-    "username": "Mariana",
-    "email": "mariana@email.com",
-    "password": "senha456",
-    "saldo": 200,
-    "historico": [
-      {
-        "data": "2024-09-10T11:20:00Z",
-        "descricao": "Recarga de saldo",
-        "valor": 120
-      },
-      {
-        "data": "2024-09-11T17:10:00Z",
-        "descricao": "Compra de bilhete: Santo André → Tamanduateí",
-        "valor": -5
-      }
-    ],
-    "favoritos": [
-      {
-        "idEstacao": 5,
-        "nome": "Tamanduateí",
-        "linha": "Linha 10 - Turquesa"
-      }
-    ]
-  },
-  {
-    "id": 4,
-    "username": "Giovana",
-    "email": "giovana@email.com",
-    "password": "senha789",
-    "saldo": 70.25,
-    "historico": [
-      {
-        "data": "2024-10-10T08:00:00Z",
-        "descricao": "Recarga de saldo",
-        "valor": 40
-      }
-    ],
-    "favoritos": [
-      {
-        "idEstacao": 6,
-        "nome": "Jurubatuba",
-        "linha": "Linha 9 - Esmeralda"
-      },
-      {
-        "idEstacao": 7,
-        "nome": "Vila Olímpia",
-        "linha": "Linha 9 - Esmeralda"
-      }
-    ]
-  },
-  {
-    "id": 5,
-    "username": "Eduardo",
-    "email": "eduardo@email.com",
-    "password": "senha321",
-    "saldo": 50,
+    "username": "giovanaaa",
+    "email": "giovanam@email.com",
+    "password": "123456",
+    "saldo": 0,
     "historico": [],
     "favoritos": []
-  },
-  {
-    "id": 6,
-    "username": "João",
-    "email": "joao@email.com",
-    "password": "senha654",
-    "saldo": 120.5,
-    "historico": [
-      {
-        "data": "2024-09-05T07:10:00Z",
-        "descricao": "Compra de bilhete: Brás → Mauá",
-        "valor": -5
-      }
-    ],
-    "favoritos": [
-      {
-        "idEstacao": 8,
-        "nome": "Mauá",
-        "linha": "Linha 10 - Turquesa"
-      }
-    ]
-  },
-  {
-    "id": 7,
-    "username": "Túlio",
-    "email": "tulio@email.com",
-    "password": "senha987",
-    "saldo": 180,
-    "historico": [
-      {
-        "data": "2024-09-15T13:00:00Z",
-        "descricao": "Recarga de saldo",
-        "valor": 80
-      }
-    ],
-    "favoritos": [
-      {
-        "idEstacao": 9,
-        "nome": "Lapa",
-        "linha": "Linha 7 - Rubi"
-      }
-    ]
   }
 ]
