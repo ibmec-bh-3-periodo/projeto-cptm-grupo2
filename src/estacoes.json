@@ -1,0 +1,391 @@
+[
+    {
+      "id": "barrafunda",
+      "nome": "Palmeiras • Barra Funda",
+      "lat": 454,
+      "lng": 510,
+      "vizinhos": ["aguabranca", "luz"]
+    },
+    {
+      "id": "aguabranca",
+      "nome": "Água Branca",
+      "lat": 454.5,
+      "lng": 481.5,
+      "vizinhos": ["barrafunda", "lapa"]
+    },
+    {
+      "id": "lapa",
+      "nome": "Lapa",
+      "lat": 454,
+      "lng": 452,
+      "vizinhos": ["aguabranca", "piqueri"]
+    },
+    {
+      "id": "piqueri",
+      "nome": "Piqueri",
+      "lat": 494.5,
+      "lng": 395,
+      "vizinhos": ["lapa", "pirituba"]
+    },
+    {
+      "id": "pirituba",
+      "nome": "Pirituba",
+      "lat": 508.5,
+      "lng": 394.5,
+      "vizinhos": ["piqueri", "vilaclarice"]
+    },
+    {
+      "id": "vilaclarice",
+      "nome": "Vila Clarice",
+      "lat": 523.5,
+      "lng": 395.5,
+      "vizinhos": ["pirituba", "jaragua"]
+    },
+    {
+      "id": "jaragua",
+      "nome": "Jaraguá",
+      "lat": 538,
+      "lng": 395,
+      "vizinhos": ["vilaclarice", "vilaaurora"]
+    },
+    {
+      "id": "vilaaurora",
+      "nome": "Vila Aurora",
+      "lat": 553,
+      "lng": 395,
+      "vizinhos": ["jaragua", "perus"]
+    },
+    {
+      "id": "perus",
+      "nome": "Perus",
+      "lat": 567,
+      "lng": 394.5,
+      "vizinhos": ["vilaaurora", "caieiras"]
+    },
+    {
+      "id": "caieiras",
+      "nome": "Caieiras",
+      "lat": 582.5,
+      "lng": 395,
+      "vizinhos": ["perus", "francodarocha"]
+    },
+    {
+      "id": "francodarocha",
+      "nome": "Franco da Rocha",
+      "lat": 597.5,
+      "lng": 394.5,
+      "vizinhos": ["caieiras", "baltazar"]
+    },
+    {
+      "id": "baltazar",
+      "nome": "Baltazar Fidelis",
+      "lat": 611,
+      "lng": 395,
+      "vizinhos": ["francodarocha", "franciscomorato"]
+    },
+    {
+      "id": "franciscomorato",
+      "nome": "Francisco Morato",
+      "lat": 631,
+      "lng": 373,
+      "vizinhos": ["baltazar", "botujuru"]
+    },
+    {
+      "id": "botujuru",
+      "nome": "Botujuru",
+      "lat": 644.5,
+      "lng": 354.5,
+      "vizinhos": ["franciscomorato", "campolimpopaulista"]
+    },
+    {
+      "id": "campolimpopaulista",
+      "nome": "Campo Limpo Paulista",
+      "lat": 662,
+      "lng": 333.5,
+      "vizinhos": ["botujuru", "varzeapaulista"]
+    },
+    {
+      "id": "varzeapaulista",
+      "nome": "Várzea Paulista",
+      "lat": 662,
+      "lng": 278.5,
+      "vizinhos": ["campolimpopaulista", "jundiai"]
+    },
+    {
+      "id": "jundiai",
+      "nome": "Jundiaí",
+      "lat": 662,
+      "lng": 218,
+      "vizinhos": ["varzeapaulista"]
+    },
+  
+    {
+      "id": "luz",
+      "nome": "Luz",
+      "lat": 454,
+      "lng": 606,
+      "vizinhos": ["barrafunda", "bras", "tatuape", "enggoulart"]
+    },
+    {
+      "id": "bras",
+      "nome": "Brás",
+      "lat": 414,
+      "lng": 680,
+      "vizinhos": ["luz", "mooca", "tamanduatuei", "tatuape"]
+    },
+    {
+      "id": "mooca",
+      "nome": "Juventus • Mooca",
+      "lat": 370,
+      "lng": 742,
+      "vizinhos": ["bras", "ipiranga"]
+    },
+    {
+      "id": "ipiranga",
+      "nome": "Ipiranga",
+      "lat": 339,
+      "lng": 780,
+      "vizinhos": ["mooca", "tamanduatuei"]
+    },
+    {
+      "id": "tamanduatuei",
+      "nome": "Tamanduateí",
+      "lat": 298,
+      "lng": 829,
+      "vizinhos": ["ipiranga", "sancaetano", "bras"]
+    },
+    {
+      "id": "sancaetano",
+      "nome": "São Caetano do Sul",
+      "lat": 280,
+      "lng": 855,
+      "vizinhos": ["tamanduatuei", "uting"]
+    },
+    {
+      "id": "uting",
+      "nome": "Utinga",
+      "lat": 261,
+      "lng": 877,
+      "vizinhos": ["sancaetano", "saladino"]
+    },
+    {
+      "id": "saladino",
+      "nome": "Prefeito Saladino",
+      "lat": 244,
+      "lng": 898,
+      "vizinhos": ["uting", "santoandre"]
+    },
+    {
+      "id": "santoandre",
+      "nome": "Santo André",
+      "lat": 223,
+      "lng": 924,
+      "vizinhos": ["saladino", "capuava"]
+    },
+    {
+      "id": "capuava",
+      "nome": "Capuava",
+      "lat": 201,
+      "lng": 951,
+      "vizinhos": ["santoandre", "maua"]
+    },
+    {
+      "id": "maua",
+      "nome": "Mauá",
+      "lat": 188,
+      "lng": 967,
+      "vizinhos": ["capuava", "guapituba"]
+    },
+    {
+      "id": "guapituba",
+      "nome": "Guapituba",
+      "lat": 174,
+      "lng": 984,
+      "vizinhos": ["maua", "ribeiraopires"]
+    },
+    {
+      "id": "ribeiraopires",
+      "nome": "Ribeirão Pires",
+      "lat": 162,
+      "lng": 1000,
+      "vizinhos": ["guapituba", "riograndedaserra"]
+    },
+    {
+      "id": "riograndedaserra",
+      "nome": "Rio Grande da Serra",
+      "lat": 143,
+      "lng": 1024,
+      "vizinhos": ["ribeiraopires"]
+    },
+  
+    {
+      "id": "tatuape",
+      "nome": "Tatuapé",
+      "lat": 425,
+      "lng": 755.5,
+      "vizinhos": ["bras", "corinthiansitaquera", "enggoulart"]
+    },
+    {
+      "id": "corinthiansitaquera",
+      "nome": "Corinthians • Itaquera",
+      "lat": 424,
+      "lng": 916.5,
+      "vizinhos": ["tatuape", "dombosco"]
+    },
+    {
+      "id": "dombosco",
+      "nome": "Dom Bosco",
+      "lat": 424,
+      "lng": 945.5,
+      "vizinhos": ["corinthiansitaquera", "josebonifacio"]
+    },
+    {
+      "id": "josebonifacio",
+      "nome": "José Bonifácio",
+      "lat": 425,
+      "lng": 964,
+      "vizinhos": ["dombosco", "guaianases"]
+    },
+    {
+      "id": "guaianases",
+      "nome": "Guaianases",
+      "lat": 424.5,
+      "lng": 983.5,
+      "vizinhos": ["josebonifacio", "ferraz"]
+    },
+    {
+      "id": "ferraz",
+      "nome": "Ferraz de Vasconcelos",
+      "lat": 434.5,
+      "lng": 1016,
+      "vizinhos": ["guaianases", "poa"]
+    },
+    {
+      "id": "poa",
+      "nome": "Poá",
+      "lat": 446,
+      "lng": 1029,
+      "vizinhos": ["ferraz", "calmonviana"]
+    },
+    {
+      "id": "calmonviana",
+      "nome": "Calmon Viana",
+      "lat": 454.5,
+      "lng": 1043.5,
+      "vizinhos": ["poa", "suzano", "itaquaquecetuba"]
+    },
+    {
+      "id": "suzano",
+      "nome": "Suzano",
+      "lat": 454.5,
+      "lng": 1063.5,
+      "vizinhos": ["calmonviana", "jundiapeba"]
+    },
+    {
+      "id": "jundiapeba",
+      "nome": "Jundiapeba",
+      "lat": 455.5,
+      "lng": 1079.5,
+      "vizinhos": ["suzano", "brasCubas"]
+    },
+    {
+      "id": "brasCubas",
+      "nome": "Brás Cubas",
+      "lat": 456,
+      "lng": 1097,
+      "vizinhos": ["jundiapeba", "mogidascruzes"]
+    },
+    {
+      "id": "mogidascruzes",
+      "nome": "Mogi das Cruzes",
+      "lat": 456,
+      "lng": 1113,
+      "vizinhos": ["brasCubas", "estudantes"]
+    },
+    {
+      "id": "estudantes",
+      "nome": "Estudantes",
+      "lat": 455.5,
+      "lng": 1129.5,
+      "vizinhos": ["mogidascruzes"]
+    },
+  
+    {
+      "id": "enggoulart",
+      "nome": "Eng. Goulart",
+      "lat": 462,
+      "lng": 802.5,
+      "vizinhos": ["luz", "uspLeste", "tatuape"]
+    },
+    {
+      "id": "uspLeste",
+      "nome": "USP Leste",
+      "lat": 488,
+      "lng": 847,
+      "vizinhos": ["enggoulart", "ermelino"]
+    },
+    {
+      "id": "ermelino",
+      "nome": "Comendador Ermelino",
+      "lat": 490.5,
+      "lng": 870.5,
+      "vizinhos": ["uspLeste", "saomiguel"]
+    },
+    {
+      "id": "saomiguel",
+      "nome": "São Miguel Paulista",
+      "lat": 489,
+      "lng": 894.5,
+      "vizinhos": ["ermelino", "vilaMara"]
+    },
+    {
+      "id": "vilaMara",
+      "nome": "Jardim Helena–Vila Mara",
+      "lat": 489,
+      "lng": 918.5,
+      "vizinhos": ["saomiguel", "itaim"]
+    },
+    {
+      "id": "itaim",
+      "nome": "Itaim Paulista",
+      "lat": 489,
+      "lng": 941,
+      "vizinhos": ["vilaMara", "manoelfeio"]
+    },
+    {
+      "id": "manoelfeio",
+      "nome": "Eng. Manoel Feio",
+      "lat": 489,
+      "lng": 990.5,
+      "vizinhos": ["itaim", "itaquaquecetuba"]
+    },
+    {
+      "id": "itaquaquecetuba",
+      "nome": "Itaquaquecetuba",
+      "lat": 482,
+      "lng": 1008,
+      "vizinhos": ["manoelfeio", "acare", "calmonviana"]
+    },
+    {
+      "id": "acare",
+      "nome": "Acararé",
+      "lat": 471.5,
+      "lng": 1021,
+      "vizinhos": ["itaquaquecetuba"]
+    },
+  
+    {
+      "id": "cecapaeroporto",
+      "nome": "Guarulhos • Cecap",
+      "lat": 652,
+      "lng": 972.5,
+      "vizinhos": ["aeroporto", "enggoulart"]
+    },
+    {
+      "id": "aeroporto",
+      "nome": "Aeroporto • Guarulhos",
+      "lat": 687,
+      "lng": 973,
+      "vizinhos": ["cecapaeroporto"]
+    }
+  ]

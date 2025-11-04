@@ -333,6 +333,112 @@
   animation: zoomOut 0.4s ease forwards;
 }
 
+#trajeto-container {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  z-index: 1600;
+  font-family: "Inter", sans-serif;
+}
+
+#botao-trajeto {
+  background-color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#trajeto-opcoes {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  width: 180px;
+}
+
+#trajeto-opcoes select,
+#trajeto-opcoes button {
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+#trajeto-opcoes button {
+  background-color: #d60000;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#trajeto-opcoes button:hover {
+  background-color: #a30000;
+}
+
+.toast {
+  text-align: center;
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 30, 30, 0.9);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, bottom 0.4s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  bottom: 80px;
+}
+
+.toast.success { background: #28a745; }
+.toast.error { background: #d60000; }
+.toast.warning { background: #ff9800; }
+
+.favorito-btn {
+  margin-bottom: 15px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.favorito-btn:hover {
+  transform: scale(1.1);
+}
+
+.heart-icon {
+  width: 26px;
+  height: 26px;
+  color: #bbb;
+  stroke: #bbb;
+  fill: none;
+  transition: all 0.3s ease;
+  vertical-align: middle;
+}
+
+.favorito-btn.favorito-ativo .heart-icon {
+  stroke: #d60000;
+  fill: #d60000;
+  color: #d60000;
+}
   </style>
 </head>
 
@@ -341,7 +447,11 @@
 <div id="map"></div>
 <div id="estacaoModal" class="modal">
     <div class="modal-content" id="modalContent">
+        <button id="favorito-btn" class="favorito-btn" onclick="toggleFavorito()">
+        
+        </button>
         <div class="modal-drag-handle" id="dragHandle"></div>
+        
     </div>
 </div>
 <div id="busca-container">
@@ -356,6 +466,26 @@
     <p>Início</p>
     <img src="./assets/img/home.svg" alt="Fechar mapa">
   </div>
+</div>
+<!-- BOTÃO E MENU DE TRAJETO -->
+<div id="trajeto-container">
+  <button id="botao-trajeto">🚆 Criar trajeto</button>
+
+  <div id="trajeto-opcoes">
+    <label>Origem:</label>
+    <select id="origem-select">
+      <option value="">Selecione...</option>
+    </select>
+
+    <label>Destino:</label>
+    <select id="destino-select">
+      <option value="">Selecione...</option>
+    </select>
+
+    <button id="gerar-rota">Gerar rota</button>
+    <button id="limpar-rota">Limpar rota</button>
+  </div>
+  <div id="toast" class="toast"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -429,9 +559,18 @@ const modal = document.getElementById("estacaoModal");
 const content = document.getElementById("modalContent");
 
 function mostrarModal(nome, linhas, descricao, corClasse, demanda) {
+  const favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+  const isFavorito = favoritos.includes(nome);
+
   content.innerHTML = `
     <div class="modal-drag-handle"></div>
-    <div class="popup-titulo ${corClasse}">${nome}</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div class="popup-titulo ${corClasse}" id="modal-nome">${nome}</div>
+      <button id="favorito-btn" class="favorito-btn ${isFavorito ? "favorito-ativo" : ""}" onclick="toggleFavorito('${nome}')"><svg xmlns="http://www.w3.org/2000/svg" class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+        </svg></button>
+    </div>
     <div class="popup-linhas">${linhas}</div>
     <div class="popup-status ${demanda.cor}">
       <span class="texto ${demanda.cor}">${demanda.texto}</span>
@@ -440,7 +579,7 @@ function mostrarModal(nome, linhas, descricao, corClasse, demanda) {
     <div class="popup-descricao">${descricao || ""}</div>
   `;
 
-  modal.style.transform = "translateY(0)"; // garante que o modal volte pro topo
+  modal.style.transform = "translateY(0)";
   modal.classList.add("active");
   document.getElementById("map").classList.add("reduzido");
 }
@@ -656,6 +795,160 @@ botaoFechar.addEventListener("click", () => {
     window.location.href = "home.html"; // redireciona após a animação
   }, 400); // igual ao tempo do CSS
 });
+
+// =====================
+// 🧭 FUNÇÃO DE TRAJETO
+// =====================
+let rotaAtiva = null;
+
+// Preencher selects com nomes das estações
+function preencherSelectsEstacoes() {
+  const origemSelect = document.getElementById("origem-select");
+  const destinoSelect = document.getElementById("destino-select");
+  origemSelect.innerHTML = "<option value=''>Selecione...</option>";
+  destinoSelect.innerHTML = "<option value=''>Selecione...</option>";
+
+  Object.values(estacoesMap).forEach(estacao => {
+    const opt1 = document.createElement("option");
+    const opt2 = document.createElement("option");
+    opt1.value = estacao.nome;
+    opt1.textContent = estacao.nome;
+    opt2.value = estacao.nome;
+    opt2.textContent = estacao.nome;
+    origemSelect.appendChild(opt1);
+    destinoSelect.appendChild(opt2);
+  });
+}
+
+// Mostrar / ocultar painel
+const botaoTrajeto = document.getElementById("botao-trajeto");
+const trajetoOpcoes = document.getElementById("trajeto-opcoes");
+
+botaoTrajeto.addEventListener("click", () => {
+  const visivel = trajetoOpcoes.style.display === "flex";
+  trajetoOpcoes.style.display = visivel ? "none" : "flex";
+  if (!visivel) preencherSelectsEstacoes();
+});
+
+function mostrarToast(mensagem, tipo = "warning") {
+  const toast = document.getElementById("toast");
+  toast.textContent = mensagem;
+  toast.className = `toast show ${tipo}`;
+  setTimeout(() => {
+    toast.className = "toast";
+  }, 3000);
+}
+
+// Gerar rota
+document.getElementById("gerar-rota").addEventListener("click", async () => {
+  const origem = document.getElementById("origem-select").value;
+  const destino = document.getElementById("destino-select").value;
+
+  if (!origem || !destino) {
+    mostrarToast("⚠️ Selecione origem e destino", "warning");
+    return;
+  }
+
+  try {
+    const resp = await fetch(`http://localhost:5001/rota?orig=${origem}&dest=${destino}`);
+    const dados = await resp.json();
+
+    if (!dados.trajeto) {
+      mostrarToast("❌ Nenhum trajeto encontrado", "error");
+      return;
+    }
+
+    const pontos = dados.trajeto.map(e => [e.lat, e.lng]);
+    if (rotaAtiva) map.removeLayer(rotaAtiva);
+
+    // 🎨 Linha estilizada
+    const outline = L.polyline(pontos, {
+      color: "#444",
+      weight: 8,
+      opacity: 0.3,
+      smoothFactor: 1
+    }).addTo(map);
+
+    const mainLine = L.polyline(pontos, {
+  color: "#F9FF00",     
+  weight: 6,             
+  opacity: 0.75,
+  smoothFactor: 1,
+  className: "trajeto-linha" // adiciona classe para CSS opcional
+}).addTo(map);
+
+// Adiciona um leve brilho via CSS:
+const style = document.createElement("style");
+style.innerHTML = `
+  .trajeto-linha {
+    filter: drop-shadow(0 0 6px rgba(230, 0, 38, 0.5));
+  }
+`;
+document.head.appendChild(style);
+  
+
+    let offset = 0;
+    setInterval(() => {
+    offset = (offset + 1) % 20;
+    mainLine.setStyle({
+    dashArray: "10, 20",
+    dashOffset: offset
+    });
+    }, 150);
+
+    rotaAtiva = L.layerGroup([outline, mainLine]).addTo(map);
+    map.fitBounds(mainLine.getBounds());
+
+    // 👇 Fecha automaticamente o menu
+    trajetoOpcoes.style.display = "none";
+
+  } catch (err) {
+    console.error("Erro ao gerar rota:", err);
+  }
+});
+
+// Limpar rota
+document.getElementById("limpar-rota").addEventListener("click", () => {
+  if (rotaAtiva) {
+    map.removeLayer(rotaAtiva);
+    rotaAtiva = null;
+  }
+});
+
+function toggleFavorito(nomeEstacao) {
+  let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+
+  const index = favoritos.indexOf(nomeEstacao);
+  const botao = document.getElementById("favorito-btn");
+
+  if (index !== -1) {
+    favoritos.splice(index, 1);
+    botao.classList.remove("favorito-ativo");
+  } else {
+    favoritos.push(nomeEstacao);
+    botao.classList.add("favorito-ativo");
+  }
+
+  localStorage.setItem("favoritos", JSON.stringify(favoritos));
+}
+
+function abrirModalEstacao(nomeEstacao) {
+  const modal = document.getElementById("modal");
+  const nome = document.getElementById("modal-nome");
+  const botaoFavorito = document.getElementById("favorito-btn");
+
+  nome.textContent = nomeEstacao;
+  modal.classList.add("show");
+
+  // Atualiza estado do coração
+  const favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+  if (favoritos.includes(nomeEstacao)) {
+    botaoFavorito.classList.add("favorito-ativo");
+  } else {
+    botaoFavorito.classList.remove("favorito-ativo");
+  }
+}
+
 </script>
 
 </body>
