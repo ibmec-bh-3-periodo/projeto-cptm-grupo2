@@ -296,4 +296,4 @@ server.post("/usuarios", (req, res) => {
   return res.status(201).json(usuarioSemSenha);
 });
 
-server.listen(3000);
+server.listen(5001);
