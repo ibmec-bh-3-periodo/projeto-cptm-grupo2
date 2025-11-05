@@ -36,6 +36,5 @@ mapa.addEventListener("click", () => {
 });
 
 function abrirFaleConosco() {
-  const url = "http://localhost:5001/fale-conosco";
-  window.open(url, "_blank");
+  window.open('http://localhost:5501/fale-conosco', '_blank');
 }

@@ -64,6 +64,15 @@ function salvarUsuarios(usuarios: any) {
 
 // ---------------------- ROTAS ----------------------
 
+// Rota para redirecionar para o WhatsApp
+const WHATSAPP_NUMBER = "5511997677030";
+
+server.get("/fale-conosco", (req: Request, res: Response) => {
+    const mensagem = encodeURIComponent("Olá! Gostaria de saber mais sobre os serviços.");
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${mensagem}`;
+    res.redirect(url);
+});
+
 // Página inicial (index.html)
 server.get("/", (_req, res) => {
   res.sendFile(path.join(ROOT, "index.html"));

@@ -34,7 +34,7 @@
           <img src="assets/img/train.svg" alt="Linhas" />
           <span>Linhas</span>
         </button>
-        <button class="icone-botao">
+        <button class="icone-botao" onclick="window.location.href='favoritos.html'">
           <img src="assets/img/favorite-icon.svg" alt="Favoritos" />
           <span>Favoritos</span>
         </button>
@@ -42,8 +42,8 @@
           <img src="assets/img/qr_code-icon.svg" alt="QR Code" />
           <span>QR Code</span>
         </button>
-        <button class="icone-botao" onclick="window.location.href='fale-conosco.html'">
-          <img src="assets/img/chat-icon.svg" alt="Fale conosco" />
+        <button class="icone-botao" onclick="abrirFaleConosco()">
+          <img src="assets/img/chat-icon.svg" alt="Fale conosco" />        
           <span>Fale conosco</span>
         </button>
       </div>
@@ -115,6 +115,9 @@ mapa.addEventListener('click', () => {
     });
 
     window.addEventListener('DOMContentLoaded', carregarSaldo);
+
+    function abrirFaleConosco() {
+      window.open('http://localhost:5501/fale-conosco', '_blank');}
   </script>
 </body>
 </html>
