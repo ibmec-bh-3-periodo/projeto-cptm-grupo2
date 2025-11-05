@@ -18,14 +18,7 @@
       <h2>Bem-vindo à CPTM</h2>
       <p>Login</p>
 
-      <!-- Mensagem de erro -->
-      <p id="erro-login" style="
-        display:none;
-        color:#ffb3b3;
-        font-weight:bold;
-        text-align:center;
-        margin-bottom:10px;">
-      </p>
+      <p id="erro-login" style="display:none;color:#ffb3b3;font-weight:bold;text-align:center;margin-bottom:10px;"></p>
 
       <form id="login-form" novalidate>
         <input type="email" id="email" placeholder="Insira seu e-mail" required />
@@ -53,7 +46,8 @@
       const senha = document.getElementById('senha').value.trim();
 
       try {
-        const response = await fetch('/login', {
+        // 🔹 IMPORTANTE: usar URL completa do servidor Node
+        const response = await fetch('http://localhost:5501/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: email, password: senha })
@@ -66,9 +60,11 @@
           erroLogin.style.display = 'block';
         } else {
           erroLogin.style.display = 'none';
+          localStorage.setItem('usuario', JSON.stringify(data.usuario));
           window.location.href = 'home.html';
         }
       } catch (err) {
+        console.error(err);
         erroLogin.textContent = 'Erro ao conectar com o servidor.';
         erroLogin.style.display = 'block';
       }

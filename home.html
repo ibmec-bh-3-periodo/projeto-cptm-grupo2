@@ -17,16 +17,16 @@
         <img class="profile" src="assets/img/icons8-male-user-96.svg" alt="Ícone de usuário" />
       </div>
       <img class="CPTM-escrito" src="assets/img/cptmescrito.png" alt="CPTM ECRITO" />
-      <img  class="logo" src="assets/img/Logo cptm.svg" alt="Logo da CPTM" />
+      <img class="logo" src="assets/img/Logo cptm.svg" alt="Logo da CPTM" />
     </div>
   </div>
 
   <div class="container">
     <p class="boas-vindas"></p>
 
-  <div class="mapa-zoom-wrapper" id="mapaWrapper">
-    <div class="mapa" id="mapaHome"></div>
-  </div>
+    <div class="mapa-zoom-wrapper" id="mapaWrapper">
+      <div class="mapa" id="mapaHome"></div>
+    </div>
 
     <div class="carousel">
       <div class="carousel-inner">
@@ -42,7 +42,7 @@
           <img src="assets/img/qr_code-icon.svg" alt="QR Code" />
           <span>QR Code</span>
         </button>
-        <button class="icone-botao">
+        <button class="icone-botao" onclick="window.location.href='fale-conosco.html'">
           <img src="assets/img/chat-icon.svg" alt="Fale conosco" />
           <span>Fale conosco</span>
         </button>
@@ -50,17 +50,66 @@
     </div>
   </div>
 
-  <section class="saldo-card" id="link-saldo">
+  <!-- 🔹 Cartão de saldo -->
+  <section class="saldo-card" id="link-saldo" onclick="window.location.href='tela-saldo.html'">
     <p>Saldo:</p>
     <div class="saldo">
-      <span id="valor-saldo" class="valor-saldo">R$ 14,70</span>
-      <button id="toggle-saldo" class="toggle-saldo" type="button">
+      <span id="valor-saldo" class="valor-saldo">Carregando...</span>
+      <button id="toggle-saldo" class="toggle-saldo" type="button" onclick="event.stopPropagation()">
         <img id="icone-olho" class="icone-saldo" src="assets/img/eye-off.svg" alt="Mostrar saldo" />
       </button>
     </div>
   </section>
-  
+
   <div id="mapa-transicao"></div>
-<script src="assets/js/home.js"></script>
+
+  <script>
+    const boasVindas = document.querySelector('.boas-vindas');
+    const valorSaldo = document.getElementById('valor-saldo');
+    const toggleBtn = document.getElementById('toggle-saldo');
+    const iconeOlho = document.getElementById('icone-olho');
+    let saldoVisivel = true;
+
+    // ✅ Pega o usuário logado
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    if (!usuario) {
+      alert('Nenhum usuário logado. Faça login novamente.');
+      window.location.href = 'login.html';
+    } else {
+      boasVindas.textContent = `Bem-vindo, ${usuario.username}!`;
+    }
+
+    const idUsuario = usuario.id;
+
+    function formatarReal(valor) {
+      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    async function carregarSaldo() {
+      try {
+        const resposta = await fetch(`http://localhost:5501/usuarios/${idUsuario}`);
+        if (!resposta.ok) throw new Error('Erro ao buscar saldo');
+        const usuarioAtualizado = await resposta.json();
+
+        valorSaldo.textContent = formatarReal(usuarioAtualizado.saldo);
+        valorSaldo.dataset.valorReal = formatarReal(usuarioAtualizado.saldo);
+
+        // Atualiza localStorage com saldo novo
+        localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado));
+      } catch (erro) {
+        console.error(erro);
+        valorSaldo.textContent = 'Erro';
+      }
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      saldoVisivel = !saldoVisivel;
+      valorSaldo.textContent = saldoVisivel ? valorSaldo.dataset.valorReal : '••••';
+      iconeOlho.src = saldoVisivel ? 'assets/img/eye-off.svg' : 'assets/img/eye.svg';
+    });
+
+    window.addEventListener('DOMContentLoaded', carregarSaldo);
+  </script>
 </body>
 </html>

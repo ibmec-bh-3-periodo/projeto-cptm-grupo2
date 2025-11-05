@@ -4,150 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minha Conta - CPTM</title>
-
-  <!-- === FAVICON (ícone da aba do navegador) === -->
   <link rel="icon" type="image/png" href="./assets/img/CPTM_icon.svg.png">
-
   <link rel="stylesheet" href="./assets/css/tela-saldo.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    /* === POP-UP (Modal) === */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9998;
-    }
-
-    .modal {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      width: 320px;
-      text-align: center;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-      animation: aparecer 0.25s ease;
-    }
-
-    @keyframes aparecer {
-      from { transform: translateY(20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal h3 {
-      margin-bottom: 16px;
-      color: #333;
-    }
-
-    .valor-input {
-      width: 100%;
-      font-size: 1.2rem;
-      text-align: center;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 12px;
-    }
-
-    .botoes-rapidos {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .botoes-rapidos button {
-      flex: 1;
-      margin: 0 4px;
-      padding: 8px 0;
-      border: none;
-      border-radius: 8px;
-      background: #e6e6e6;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .botoes-rapidos button:hover {
-      background: #d0d0d0;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .modal-actions button {
-      flex: 1;
-      margin: 0 4px;
-      padding: 10px 0;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .confirmar {
-      background: #0a8a2a;
-      color: #fff;
-    }
-
-    .cancelar {
-      background: #e53935;
-      color: #fff;
-    }
-
-    .confirmar:hover { background: #0c6f24; }
-    .cancelar:hover { background: #c62828; }
-
-    /* === TOAST MESSAGE (app style) === */
-    .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(50px);
-      min-width: 260px;
-      background: linear-gradient(135deg, #0a8a2a, #0ccf4e);
-      color: #fff;
-      padding: 14px 22px;
-      border-radius: 14px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      opacity: 0;
-      transition: transform 0.6s ease, opacity 0.6s ease;
-      font-weight: 600;
-      z-index: 9999;
-    }
-
-    .toast svg {
-      width: 22px;
-      height: 22px;
-      flex-shrink: 0;
-      animation: pop 0.3s ease;
-    }
-
-    @keyframes pop {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .toast.mostrar {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-
-    .toast.erro {
-      background: linear-gradient(135deg, #e53935, #ff4d4d);
-    }
-  </style>
 </head>
 <body>
   <header class="header">
@@ -204,7 +65,7 @@
     </div>
   </main>
 
-  <!-- Modal interativo -->
+  <!-- Modal -->
   <div class="modal-overlay" id="modal-overlay">
     <div class="modal">
       <h3>Adicionar Saldo</h3>
@@ -222,7 +83,7 @@
     </div>
   </div>
 
-  <!-- Toast (mensagem estilo app) -->
+  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
   <script>
@@ -238,29 +99,37 @@
     const toast = document.getElementById('toast');
 
     let saldoVisivel = true;
-    let idUsuario = 1;
+
+    // ✅ Pega o usuário logado do localStorage
+    const usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    if (!usuario) {
+      alert('Nenhum usuário logado. Faça login novamente.');
+      window.location.href = 'login.html';
+    }
+
+    const idUsuario = usuario.id;
 
     function mostrarMensagem(texto, tipo = "sucesso") {
-      const icone = tipo === "erro"
-        ? '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>'
-        : '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>';
+      toast.textContent = texto;
+      toast.className = "toast " + (tipo === "erro" ? "erro mostrar" : "mostrar");
+      setTimeout(() => toast.classList.remove("mostrar"), 3000);
+    }
 
-      toast.innerHTML = `${icone} ${texto}`;
-      toast.classList.remove("erro", "mostrar");
-      if (tipo === "erro") toast.classList.add("erro");
-
-      requestAnimationFrame(() => toast.classList.add("mostrar"));
-      clearTimeout(toast.timeoutId);
-      toast.timeoutId = setTimeout(() => toast.classList.remove("mostrar"), 3000);
+    function formatarReal(valor) {
+      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
     async function carregarSaldo() {
       try {
-        const resposta = await fetch(`http://localhost:3000/usuarios/${idUsuario}`);
+        const resposta = await fetch(`http://localhost:5501/usuarios/${idUsuario}`);
         if (!resposta.ok) throw new Error("Erro ao buscar saldo");
-        const usuario = await resposta.json();
-        valorSaldo.textContent = formatarReal(usuario.saldo);
-        valorSaldo.dataset.valorReal = formatarReal(usuario.saldo);
+        const usuarioAtualizado = await resposta.json();
+        valorSaldo.textContent = formatarReal(usuarioAtualizado.saldo);
+        valorSaldo.dataset.valorReal = formatarReal(usuarioAtualizado.saldo);
+
+        // Atualiza o localStorage também
+        localStorage.setItem('usuario', JSON.stringify(usuarioAtualizado));
       } catch (erro) {
         console.error("Erro ao carregar saldo:", erro);
         valorSaldo.textContent = "Erro";
@@ -293,10 +162,6 @@
       });
     });
 
-    function formatarReal(valor) {
-      return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
     btnConfirmar.addEventListener('click', async () => {
       const entrada = valorInput.value;
       const valorAdicionar = Number(entrada.replace(/[^\d,.-]/g, '').replace(',', '.').trim());
@@ -307,7 +172,7 @@
       }
 
       try {
-        const resposta = await fetch(`http://localhost:3000/usuarios/${idUsuario}/saldo`, {
+        const resposta = await fetch(`http://localhost:5501/usuarios/${idUsuario}/saldo`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ valor: valorAdicionar })

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Favoritos - CPTM</title>
+
+  <link rel="icon" type="image/png" href="./assets/img/CPTM_icon.svg.png">
+  <link rel="stylesheet" href="./assets/css/style-favoritos.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    header {
+      background: #e30000;
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    header button {
+      background: #fff;
+      color: #e30000;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: 0.2s;
+    }
+
+    header button:hover {
+      background: #f5f5f5;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    .lista-favoritos {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .favorito-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: 0.2s ease;
+    }
+
+    .favorito-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    .favorito-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .favorito-nome {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .favorito-linha {
+      font-size: 0.9rem;
+      color: #777;
+    }
+
+    .favorito-botoes {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .btn.ver {
+      background: #e30000;
+      color: #fff;
+    }
+
+    .btn.remover {
+      background: #ddd;
+    }
+
+    .btn.ver:hover { background: #c60000; }
+    .btn.remover:hover { background: #ccc; }
+
+    .mensagem-vazia {
+      text-align: center;
+      color: #777;
+      margin-top: 80px;
+      font-size: 1rem;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(20, 20, 20, 0.9);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.4s, transform 0.4s;
+      z-index: 9999;
+      font-size: 14px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Favoritos</h1>
+    <button onclick="window.location.href='home.html'">← Início</button>
+  </header>
+
+  <main>
+    <div id="listaFavoritos" class="lista-favoritos"></div>
+    <p id="mensagemVazia" class="mensagem-vazia" style="display:none;">Nenhuma estação foi favoritada ainda.</p>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const lista = document.getElementById("listaFavoritos");
+    const mensagemVazia = document.getElementById("mensagemVazia");
+    const toast = document.getElementById("toast");
+
+    let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+
+    function mostrarToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    function atualizarLista() {
+      lista.innerHTML = "";
+      if (favoritos.length === 0) {
+        mensagemVazia.style.display = "block";
+        return;
+      }
+
+      mensagemVazia.style.display = "none";
+
+      favoritos.forEach((nome, index) => {
+        const card = document.createElement("div");
+        card.classList.add("favorito-card");
+
+        const info = document.createElement("div");
+        info.classList.add("favorito-info");
+
+        const nomeEl = document.createElement("div");
+        nomeEl.classList.add("favorito-nome");
+        nomeEl.textContent = nome;
+
+        const linhaEl = document.createElement("div");
+        linhaEl.classList.add("favorito-linha");
+        linhaEl.textContent = "Linha desconhecida";
+
+        info.appendChild(nomeEl);
+        info.appendChild(linhaEl);
+
+        const botoes = document.createElement("div");
+        botoes.classList.add("favorito-botoes");
+
+        const btnVer = document.createElement("button");
+        btnVer.classList.add("btn", "ver");
+        btnVer.textContent = "Ver no mapa";
+        btnVer.onclick = () => {
+          localStorage.setItem("abrirEstacao", nome);
+          window.location.href = "mapa.html";
+        };
+
+        const btnRemover = document.createElement("button");
+        btnRemover.classList.add("btn", "remover");
+        btnRemover.textContent = "Remover";
+        btnRemover.onclick = () => {
+          favoritos.splice(index, 1);
+          localStorage.setItem("favoritos", JSON.stringify(favoritos));
+          atualizarLista();
+          mostrarToast("Favorito removido");
+        };
+
+        botoes.appendChild(btnVer);
+        botoes.appendChild(btnRemover);
+        card.appendChild(info);
+        card.appendChild(botoes);
+
+        lista.appendChild(card);
+      });
+    }
+
+    atualizarLista();
+  </script>
+</body>
+</html>
