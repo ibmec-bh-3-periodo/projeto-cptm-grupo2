@@ -213,7 +213,77 @@ server.get("/usuarios/:id", (req, res) => {
   if (!usuario) return res.status(404).json({ message: "Usuário não encontrado." });
   return res.json(usuario);
 });
+ // ---------------------- ROTA DE GERAÇÃO DE TRAJETO ----------------------
+import estacoes from "./estacoes.json";
 
+// Função para normalizar texto (sem acento e minúsculo)
+function normalizarTexto(texto: string): string {
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+// Algoritmo simples de busca (BFS) para encontrar o caminho entre duas estações
+function buscarCaminho(origemId: string, destinoId: string) {
+  const visitados = new Set<string>();
+  const fila: string[][] = [[origemId]];
+
+  while (fila.length > 0) {
+    const caminho = fila.shift()!;
+    const ultima = caminho[caminho.length - 1];
+
+    if (ultima === destinoId) return caminho;
+
+    const estacaoAtual = estacoes.find(e => e.id === ultima);
+    if (!estacaoAtual) continue;
+
+    for (const vizinho of estacaoAtual.vizinhos) {
+      if (!visitados.has(vizinho)) {
+        visitados.add(vizinho);
+        fila.push([...caminho, vizinho]);
+      }
+    }
+  }
+
+  return null;
+}
+
+// Endpoint para gerar rota
+server.get("/rota", (req: Request, res: Response) => {
+  const origemNome = req.query.orig as string;
+  const destinoNome = req.query.dest as string;
+
+  if (!origemNome || !destinoNome) {
+    return res.status(400).json({ erro: "Parâmetros orig e dest são obrigatórios" });
+  }
+
+  const origemEstacao = estacoes.find(
+    e => normalizarTexto(e.nome) === normalizarTexto(origemNome) || e.id === origemNome
+  );
+  const destinoEstacao = estacoes.find(
+    e => normalizarTexto(e.nome) === normalizarTexto(destinoNome) || e.id === destinoNome
+  );
+
+  if (!origemEstacao || !destinoEstacao) {
+    return res.status(404).json({ erro: "Estação de origem ou destino não encontrada" });
+  }
+
+  const caminhoIds = buscarCaminho(origemEstacao.id, destinoEstacao.id);
+  if (!caminhoIds) {
+    return res.status(404).json({ erro: "Nenhum trajeto encontrado" });
+  }
+
+  // monta array com coordenadas para o mapa
+  const trajeto = caminhoIds
+    .map(id => estacoes.find(e => e.id === id))
+    .filter(Boolean)
+    .map(e => ({ id: e!.id, nome: e!.nome, lat: e!.lat, lng: e!.lng }));
+
+  return res.json({
+    origem: origemEstacao.nome,
+    destino: destinoEstacao.nome,
+    total_estacoes: trajeto.length,
+    trajeto
+  });
+});
 
 
 // ---------------------- INICIAR SERVIDOR ----------------------
