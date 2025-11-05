@@ -850,7 +850,7 @@ document.getElementById("gerar-rota").addEventListener("click", async () => {
   }
 
   try {
-    const resp = await fetch(`http://localhost:5001/rota?orig=${origem}&dest=${destino}`);
+    const resp = await fetch(`http://localhost:5501/rota?orig=${origem}&dest=${destino}`);
     const dados = await resp.json();
 
     if (!dados.trajeto) {
