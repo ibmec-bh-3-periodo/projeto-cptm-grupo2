@@ -218,6 +218,14 @@ main {
     text-align: center;
 }
 
+.mapa-zoom-wrapper {
+  pointer-events: none; /* cliques passam por baixo */
+}
+
+.mapa {
+  pointer-events: auto; /* o mapa em si continua interativo */
+}
+
 
 
 

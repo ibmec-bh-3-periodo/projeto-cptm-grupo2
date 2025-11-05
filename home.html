@@ -64,6 +64,11 @@
   <div id="mapa-transicao"></div>
 
   <script>
+    const mapa = document.getElementById('mapaHome');
+
+mapa.addEventListener('click', () => {
+  window.location.href = 'mapa.html';
+});
     const boasVindas = document.querySelector('.boas-vindas');
     const valorSaldo = document.getElementById('valor-saldo');
     const toggleBtn = document.getElementById('toggle-saldo');
