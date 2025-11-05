@@ -2,233 +2,246 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Favoritos - CPTM</title>
-
-  <link rel="icon" type="image/png" href="./assets/img/CPTM_icon.svg.png">
-  <link rel="stylesheet" href="./assets/css/style-favoritos.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-  <style>
-    body {
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      background: #f5f5f5;
-      color: #333;
-    }
-
-    header {
-      background: #e30000;
-      color: #fff;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 1.4rem;
-    }
-
-    header button {
-      background: #fff;
-      color: #e30000;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 8px 12px;
-      transition: 0.2s;
-    }
-
-    header button:hover {
-      background: #f5f5f5;
-    }
-
-    main {
-      padding: 20px;
-    }
-
-    .lista-favoritos {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .favorito-card {
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: 0.2s ease;
-    }
-
-    .favorito-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-
-    .favorito-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .favorito-nome {
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .favorito-linha {
-      font-size: 0.9rem;
-      color: #777;
-    }
-
-    .favorito-botoes {
-      display: flex;
-      gap: 10px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      padding: 8px 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-
-    .btn.ver {
-      background: #e30000;
-      color: #fff;
-    }
-
-    .btn.remover {
-      background: #ddd;
-    }
-
-    .btn.ver:hover { background: #c60000; }
-    .btn.remover:hover { background: #ccc; }
-
-    .mensagem-vazia {
-      text-align: center;
-      color: #777;
-      margin-top: 80px;
-      font-size: 1rem;
-    }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(20, 20, 20, 0.9);
-      color: white;
-      padding: 10px 16px;
-      border-radius: 10px;
-      opacity: 0;
-      transition: opacity 0.4s, transform 0.4s;
-      z-index: 9999;
-      font-size: 14px;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-  </style>
+  <link rel="stylesheet" href="./assets/css/tela-favoritos.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <header>
-    <h1>Favoritos</h1>
-    <button onclick="window.location.href='home.html'">← Início</button>
+  <header class="header">
+    <div class="top-row">
+      <a class="link-back" href="home.html"><button class="back-button">←</button></a>
+      <span class="title">CPTM</span>
+      <img src="./assets/img/Logo cptm.png" alt="Logo CPTM" class="logo">
+    </div>
+    <div class="minha-conta"><h3>Favoritos</h3></div>
   </header>
 
-  <main>
-    <div id="listaFavoritos" class="lista-favoritos"></div>
-    <p id="mensagemVazia" class="mensagem-vazia" style="display:none;">Nenhuma estação foi favoritada ainda.</p>
+  <!-- MODAL DE ADIÇÃO -->
+  <div class="modal-busca-overlay" id="modal-busca" aria-hidden="true">
+    <div class="modal-busca">
+      <input id="modalSearchInput" type="text" placeholder="Buscar estação, linha ou trajeto">
+      <div id="modal-carrossel" class="modal-carrossel"></div>
+      <button class="fechar-modal" id="fecharModalBusca">Fechar</button>
+    </div>
+  </div>
+
+  <!-- MODAL DE REMOÇÃO -->
+  <div class="modal-remover-overlay" id="modal-remover" aria-hidden="true">
+    <div class="modal-remover">  
+      <h3 style="margin-bottom: 12px;">Remover favorito</h3>
+      <div id="modal-remover-carrossel" class="modal-carrossel"></div>
+      <button class="fechar-modal" id="fecharModalRemover">Fechar</button>
+    </div>
+  </div>
+
+  <main class="container">
+    <section class="busca-box">
+      <button id="btnAdd" type="button" class="btn-add">ADICIONAR FAVORITO</button>
+      <button id="btnRemove" type="button" class="btn-remove">×</button>
+    </section>
+
+    <!-- Lista fixa -->
+    <section id="favList" class="lista">
+      <article class="card">
+        <div class="esq">
+          <div class="pill mapa">
+            <img src="./assets/img/train.svg" alt="Mapa da rede">
+          </div>
+          <div class="info">
+            <h3>Mapa da rede</h3>
+            <p>Acesso rápido</p>
+          </div>
+        </div>
+        <button class="line-action mapa" title="Abrir" onclick="location.href='mapa.html'">
+          <img src="./assets/play_arrow.svg" alt="Abrir">
+        </button>
+      </article>
+
+      <article class="card">
+        <div class="esq">
+          <div class="pill rubi">
+            <img src="./assets/img/train.svg" alt="Linha 7 – Rubi">
+          </div>
+          <div class="info">
+            <h3>Linha 7 – Rubi</h3>
+            <p>Último acesso: ontem</p>
+          </div>
+        </div>
+        <button class="line-action rubi" title="Detalhes">
+          <img src="./assets/play_arrow.svg" alt="Detalhes">
+        </button>
+      </article>
+
+      <article class="card">
+        <div class="esq">
+          <div class="pill turquesa">
+            <img src="./assets/img/train.svg" alt="Linha 10 – Turquesa">
+          </div>
+          <div class="info">
+            <h3>Linha 10 – Turquesa</h3>
+            <p>Estação favorita: Utinga</p>
+          </div>
+        </div>
+        <button class="line-action turquesa" title="Detalhes">
+          <img src="./assets/play_arrow.svg" alt="Detalhes">
+        </button>
+      </article>
+    </section>
+
+    <!-- Lista dinâmica -->
+    <section id="favListDinamicos" class="lista"></section>
+
+    <div id="emptyState" class="empty" hidden>Nenhum favorito ainda.</div>
   </main>
 
-  <div id="toast" class="toast"></div>
-
   <script>
-    const lista = document.getElementById("listaFavoritos");
-    const mensagemVazia = document.getElementById("mensagemVazia");
-    const toast = document.getElementById("toast");
+    const btnAdd = document.getElementById('btnAdd');
+    const btnRemove = document.getElementById('btnRemove');
+    const modal = document.getElementById('modal-busca');
+    const modalRemover = document.getElementById('modal-remover');
+    const fecharModal = document.getElementById('fecharModalBusca');
+    const fecharModalRemover = document.getElementById('fecharModalRemover');
+    const modalInput = document.getElementById('modalSearchInput');
+    const modalCarrossel = document.getElementById('modal-carrossel');
+    const modalRemoverCarrossel = document.getElementById('modal-remover-carrossel');
+    const favListDinamicos = document.getElementById('favListDinamicos');
+    const emptyState = document.getElementById('emptyState');
 
-    let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
+    let linhasDisponiveis = [];
 
-    function mostrarToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 3000);
+    function syncEmpty() {
+      emptyState.hidden = favListDinamicos.children.length > 0;
     }
 
-    function atualizarLista() {
-      lista.innerHTML = "";
-      if (favoritos.length === 0) {
-        mensagemVazia.style.display = "block";
+    fetch('./assets/data/linhas.json')
+      .then(res => res.json())
+      .then(linhas => {
+        linhasDisponiveis = linhas;
+      });
+
+    function linhaJaFavoritada(nome) {
+      const cards = document.querySelectorAll('.card h3');
+      return Array.from(cards).some(card => card.textContent.trim() === nome);
+    }
+
+    function montarCarrossel(linhas) {
+      modalCarrossel.innerHTML = '';
+      const filtradas = linhas.filter(linha => !linhaJaFavoritada(linha.nome));
+      if (filtradas.length === 0) {
+        modalCarrossel.innerHTML = '<p style="text-align:center; color:#444;">Todas as linhas já foram adicionadas.</p>';
         return;
       }
 
-      mensagemVazia.style.display = "none";
+      filtradas.forEach(linha => {
+        const card = document.createElement('div');
+        card.className = 'linha-card';
+        card.dataset.nome = linha.nome.toLowerCase();
 
-      favoritos.forEach((nome, index) => {
-        const card = document.createElement("div");
-        card.classList.add("favorito-card");
+        const cor = document.createElement('div');
+        cor.className = 'cor-bolinha';
+        cor.style.backgroundColor = linha.cor;
 
-        const info = document.createElement("div");
-        info.classList.add("favorito-info");
+        const texto = document.createElement('span');
+        texto.textContent = linha.nome;
 
-        const nomeEl = document.createElement("div");
-        nomeEl.classList.add("favorito-nome");
-        nomeEl.textContent = nome;
+        card.appendChild(cor);
+        card.appendChild(texto);
+        modalCarrossel.appendChild(card);
 
-        const linhaEl = document.createElement("div");
-        linhaEl.classList.add("favorito-linha");
-        linhaEl.textContent = "Linha desconhecida";
-
-        info.appendChild(nomeEl);
-        info.appendChild(linhaEl);
-
-        const botoes = document.createElement("div");
-        botoes.classList.add("favorito-botoes");
-
-        const btnVer = document.createElement("button");
-        btnVer.classList.add("btn", "ver");
-        btnVer.textContent = "Ver no mapa";
-        btnVer.onclick = () => {
-          localStorage.setItem("abrirEstacao", nome);
-          window.location.href = "mapa.html";
-        };
-
-        const btnRemover = document.createElement("button");
-        btnRemover.classList.add("btn", "remover");
-        btnRemover.textContent = "Remover";
-        btnRemover.onclick = () => {
-          favoritos.splice(index, 1);
-          localStorage.setItem("favoritos", JSON.stringify(favoritos));
-          atualizarLista();
-          mostrarToast("Favorito removido");
-        };
-
-        botoes.appendChild(btnVer);
-        botoes.appendChild(btnRemover);
-        card.appendChild(info);
-        card.appendChild(botoes);
-
-        lista.appendChild(card);
+        card.addEventListener('click', () => {
+          const favorito = document.createElement('article');
+          favorito.className = 'card';
+          favorito.innerHTML = `
+            <div class="esq">
+              <div class="pill" style="background-color: ${linha.cor}">
+                <img src="./assets/img/train.svg" alt="${linha.nome}">
+              </div>
+              <div class="info">
+                <h3>${linha.nome}</h3>
+                <p>Adicionado agora</p>
+              </div>
+            </div>
+            <button class="line-action" style="background-color: ${linha.cor}" title="Abrir">
+              <img src="./assets/play_arrow.svg" alt="Abrir">
+            </button>
+          `;
+          favListDinamicos.appendChild(favorito);
+          syncEmpty();
+          modal.style.display = 'none';
+          modalInput.value = '';
+          montarCarrossel(linhasDisponiveis);
+        });
       });
     }
 
-    atualizarLista();
-  </script>
+    function montarCarrosselRemover() {
+      modalRemoverCarrossel.innerHTML = '';
+      const favoritos = favListDinamicos.querySelectorAll('.card');
+
+      if (favoritos.length === 0) {
+        modalRemoverCarrossel.innerHTML = '<p style="text-align:center; color:#444;">Nenhum favorito para remover.</p>';
+        return;
+      }
+
+      favoritos.forEach(card => {
+        const nome = card.querySelector('h3')?.textContent.trim();
+        const cor = card.querySelector('.pill')?.style.backgroundColor || '#ccc';
+
+        const item = document.createElement('div');
+        item.className = 'linha-card';
+        item.innerHTML = `
+          <div class="cor-bolinha" style="background-color: ${cor}"></div>
+          <span>${nome}</span>
+        `;
+
+        item.addEventListener('click', () => {
+          card.remove();
+          syncEmpty();
+          modalRemover.style.display = 'none';
+          modalRemoverCarrossel.innerHTML = '';
+          montarCarrossel(linhasDisponiveis);
+        });
+
+        modalRemoverCarrossel.appendChild(item);
+      });
+    }
+
+    btnAdd.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      modalInput.value = '';
+      montarCarrossel(linhasDisponiveis);
+      modalInput.focus();
+    });
+
+    btnRemove.addEventListener('click', () => {
+      modalRemover.style.display = 'flex';
+      montarCarrosselRemover();
+    });
+
+    fecharModal.addEventListener('click', () => {
+    modal.style.display = 'none';
+    modalInput.value = '';
+    modalCarrossel.innerHTML = '';
+  });
+
+  fecharModalRemover.addEventListener('click', () => {
+    modalRemover.style.display = 'none';
+    modalRemoverCarrossel.innerHTML = '';
+  });
+
+  modalInput.addEventListener('input', () => {
+    const termo = modalInput.value.toLowerCase();
+    const filtradas = linhasDisponiveis.filter(linha =>
+      linha.nome.toLowerCase().includes(termo) && !linhaJaFavoritada(linha.nome)
+    );
+    montarCarrossel(filtradas);
+  });
+
+  syncEmpty();
+</script>
 </body>
 </html>
