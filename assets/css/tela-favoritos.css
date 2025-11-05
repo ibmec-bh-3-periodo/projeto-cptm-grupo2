@@ -1,0 +1,395 @@
+/* ===== BASE – igual à tela de saldo ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: #d60000;            /* fundo vermelho */
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+.header {
+  background: #d60000;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: auto;
+  padding-bottom: 28px;
+}
+
+.top-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #f5f5f5;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+}
+
+.link-back { text-decoration: none; color: #f5f5f5; }
+.logo { height: 24px; }
+.title { font-weight: 700; }
+
+/* Título no mesmo estilo do saldo */
+.minha-conta { margin-top: 12px; font-size: 20px; }
+.minha-conta h3 { font-weight: 500; }
+
+/* ===== CONTAINER (bolha cinza até o rodapé) ===== */
+:root { --header-h: 128px; } /* altura aproximada do header */
+
+.container {
+  width: 100%;
+  margin: 0;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  background-color: #E0E0E0;
+  padding: 20px 16px 32px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 700px) {
+  .container {
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+
+
+/* ===== BUSCA ===== */
+.busca-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.busca-box input {
+  flex: 1;
+  max-width: 260px;
+  border: 1px solid #e2e2e2;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #fff;
+  font-size: 14px;
+}
+
+
+
+/* ===== LISTA / CARDS – coerente com a tela de saldo ===== */
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  /* ocupa o restante, empurra o fundo cinza até embaixo */
+  flex: 1;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+}
+
+.esq { display: flex; gap: 12px; align-items: center; }
+.info h3 { margin: 0 0 2px; font-size: 16px; font-weight: 600; color: #121212; }
+.info p  { font-size: 13px; color: #444; }
+
+/* Pílula colorida com trem à esquerda */
+.pill {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+}
+.pill img { width: 20px; height: 20px; filter: brightness(0) invert(1); }
+
+/* Botão “faixa” à direita com seta (igual Linhas) */
+.line-action {
+  width: 70px;
+  height: 100%;
+  position: absolute;
+  right: 0; top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  background: #ef4444;            /* cor padrão; cada linha sobrescreve */
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.line-action img { width: 28px; height: 28px; filter: brightness(0) invert(1); }
+
+/* Paleta das linhas (ajuste se preferir) */
+.mapa     { background: #E30000; }
+.rubi     { background: #8c2b61; }
+.turquesa { background: #458797; }
+.coral    { background: #bf4124; }
+.safira   { background: #1c146b; }
+.jade     { background: #038c3e; }
+.generica { background: #9ca3af; }
+
+/* ===== ESTADO VAZIO ===== */
+.empty {
+  text-align: center;
+  color: #444;
+  font-size: 14px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+/* ===== CARROSSEL DE LINHAS ===== */
+.carrossel-linhas {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* ===== CARD DE LINHA ===== */
+.linha-card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.linha-card:hover {
+  background: #f0f0f0;
+}
+
+.linha-card .cor-bolinha {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+/* ===== MODAL DE ADIÇÃO ===== */
+.modal-busca-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 60px;
+  z-index: 999;
+}
+
+.modal-busca {
+  background: #fff;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-busca input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.modal-carrossel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== BOTÃO FECHAR MODAL ===== */
+.fechar-modal {
+  margin-top: 16px;
+  background: #d60000;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ===== BOTÕES DE AÇÃO (ADICIONAR + REMOVER) ===== */
+.busca-box {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+/* Botão ADICIONAR FAVORITO – estilo retangular */
+.btn-add {
+  flex: 5;
+  height: 48px;
+  background: #d60000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove {
+  flex: 1;
+  height: 48px;
+  width: 48px;
+  background: #d60000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ===== MODAL DE REMOÇÃO ===== */
+.modal-remover-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 60px;
+  z-index: 999;
+}
+
+.modal-remover {
+  background: #fff;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-remover h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #d60000;
+  text-align: center;
+}
+
+/* Container dos botões */
+.busca-box {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Botão ADICIONAR FAVORITO */
+.btn-add {
+  height: 48px;
+  background: #d60000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Botão REMOVER FAVORITO */
+.btn-remove {
+  height: 48px;
+  width: 48px;
+  background: #d60000;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+
+
+
+/* Lista de favoritos */
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Card de favorito */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  margin: 0;
+}
+
+
+
+/* ===== RESPONSIVO ===== */
+@media (min-width: 700px) {
+  .minha-conta h3 { font-size: 28px; }
+}
