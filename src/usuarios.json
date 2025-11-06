@@ -60,8 +60,14 @@
     "username": "giovanaaa",
     "email": "giovanam@email.com",
     "password": "123456",
-    "saldo": 0,
-    "historico": [],
+    "saldo": 10,
+    "historico": [
+      {
+        "data": "2025-11-05T17:51:52.597Z",
+        "descricao": "Recarga de saldo (+R$ 10.00)",
+        "valor": 10
+      }
+    ],
     "favoritos": []
   }
 ]
