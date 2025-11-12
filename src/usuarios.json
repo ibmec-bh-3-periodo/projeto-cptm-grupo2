@@ -156,5 +156,23 @@
         "linha": "Linha 7 - Rubi"
       }
     ]
+  },
+  {
+    "id": 8,
+    "username": "Tulio",
+    "email": "tulio.castro14@gmail.com",
+    "password": "123456",
+    "saldo": 0,
+    "historico": [],
+    "favoritos": []
+  },
+  {
+    "id": 9,
+    "username": "tulio",
+    "email": "tulio",
+    "password": "123456",
+    "saldo": 0,
+    "historico": [],
+    "favoritos": []
   }
 ]

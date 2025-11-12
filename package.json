@@ -2,21 +2,30 @@
   "name": "projeto-cptm-grupo2",
   "version": "1.0.0",
   "description": "Projeto CPTM Shark Tech: Davi Araujo, Henrique Costa, Mariana Barreto, Felipe Cheik, Matheus Menezes, Giovana Marra",
-  "main": "src/server.ts",
+
+  "main": "dist/server.js",
+
   "scripts": {
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ibmec-bh-3-periodo/projeto-cptm-grupo2.git"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
+
   "bugs": {
     "url": "https://github.com/ibmec-bh-3-periodo/projeto-cptm-grupo2/issues"
   },
+
   "homepage": "https://github.com/ibmec-bh-3-periodo/projeto-cptm-grupo2#readme",
+
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
@@ -24,6 +33,7 @@
     "tsx": "^4.16.2",
     "typescript": "^5.5.4"
   },
+
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2"
