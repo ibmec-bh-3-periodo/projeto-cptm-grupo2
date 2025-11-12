@@ -66,6 +66,18 @@ function salvarUsuarios(usuarios: any) {
   }
 }
 
+function encontrarUsuarioPorId(id: number) {
+  const usuarios = carregarUsuarios();
+  const usuario = usuarios.find((u: any) => u.id === id);
+  return { usuarios, usuario };
+}
+
+function garantirFavoritos(usuario: any) {
+  if (usuario && !Array.isArray(usuario.favoritos)) {
+    usuario.favoritos = [];
+  }
+}
+
 // ---------------------- ROTAS ----------------------
 
 // Rota para redirecionar para o WhatsApp
@@ -98,6 +110,7 @@ server.post("/login", (req: Request, res: Response) => {
   );
 
   if (usuarioEncontrado) {
+    garantirFavoritos(usuarioEncontrado);
     console.log("✅ Login bem-sucedido:", username);
     return res.status(200).json({
       message: "Login realizado com sucesso!",
@@ -106,6 +119,7 @@ server.post("/login", (req: Request, res: Response) => {
         username: usuarioEncontrado.username,
         email: usuarioEncontrado.email,
         saldo: usuarioEncontrado.saldo,
+        favoritos: usuarioEncontrado.favoritos,
       },
     });
   } else {
@@ -133,6 +147,7 @@ server.put("/tela-saldo", (req: Request, res: Response) => {
     return res.status(400).json({ message: "Saldo insuficiente para gerar bilhete." });
   }
 
+  garantirFavoritos(usuario);
   usuario.saldo -= valorPassagem;
   usuario.historico.push({
     data: new Date().toISOString(),
@@ -186,10 +201,10 @@ server.post("/usuarios", (req, res) => {
 
 // ✅ Retorna um usuário pelo ID (para a tela-saldo carregar)
 server.get("/usuarios/:id", (req, res) => {
-  const usuarios = carregarUsuarios();
   const id = Number(req.params.id);
-  const usuario = usuarios.find((u: any) => u.id === id);
+  const { usuario } = encontrarUsuarioPorId(id);
   if (!usuario) return res.status(404).json({ message: "Usuário não encontrado." });
+  garantirFavoritos(usuario);
   return res.json(usuario);
 });
 
@@ -202,8 +217,7 @@ server.put("/usuarios/:id/saldo", (req, res) => {
     return res.status(400).json({ message: "Valor inválido." });
   }
 
-  const usuarios = carregarUsuarios();
-  const usuario = usuarios.find((u: any) => u.id === id);
+  const { usuarios, usuario } = encontrarUsuarioPorId(id);
   if (!usuario) {
     return res.status(404).json({ message: "Usuário não encontrado." });
   }
@@ -215,18 +229,78 @@ server.put("/usuarios/:id/saldo", (req, res) => {
     valor: Number(valor),
   });
 
+  garantirFavoritos(usuario);
   salvarUsuarios(usuarios);
   return res.status(200).json({ message: "Saldo atualizado!", saldoAtual: usuario.saldo });
 });
 
-server.get("/usuarios/:id", (req, res) => {
-  const usuarios = carregarUsuarios();
+server.get("/usuarios/:id/favoritos", (req, res) => {
   const id = Number(req.params.id);
-  const usuario = usuarios.find((u: any) => u.id === id);
-  if (!usuario) return res.status(404).json({ message: "Usuário não encontrado." });
-  return res.json(usuario);
+  const { usuario } = encontrarUsuarioPorId(id);
+  if (!usuario) {
+    return res.status(404).json({ message: "Usuário não encontrado." });
+  }
+  garantirFavoritos(usuario);
+  return res.json({ favoritos: usuario.favoritos });
 });
- // ---------------------- ROTA DE GERAÇÃO DE TRAJETO ----------------------
+
+server.post("/usuarios/:id/favoritos", (req, res) => {
+  const id = Number(req.params.id);
+  const { idEstacao, nome, linha } = req.body;
+
+  if ((!idEstacao && !nome) || typeof (nome ?? "") !== "string") {
+    return res.status(400).json({ message: "Informe ao menos o idEstacao ou nome da estação." });
+  }
+
+  const { usuarios, usuario } = encontrarUsuarioPorId(id);
+  if (!usuario) {
+    return res.status(404).json({ message: "Usuário não encontrado." });
+  }
+
+  garantirFavoritos(usuario);
+
+  const estacaoId = String(idEstacao ?? nome);
+  const jaExiste = usuario.favoritos.some(
+    (favorito: any) => String(favorito.idEstacao) === estacaoId
+  );
+
+  if (!jaExiste) {
+    usuario.favoritos.push({
+      idEstacao: estacaoId,
+      nome: nome ?? "",
+      linha: linha ?? "",
+    });
+    salvarUsuarios(usuarios);
+  }
+
+  return res.status(200).json({ favoritos: usuario.favoritos });
+});
+
+server.delete("/usuarios/:id/favoritos/:estacaoId", (req, res) => {
+  const id = Number(req.params.id);
+  const estacaoId = String(req.params.estacaoId);
+  const { usuarios, usuario } = encontrarUsuarioPorId(id);
+
+  if (!usuario) {
+    return res.status(404).json({ message: "Usuário não encontrado." });
+  }
+
+  garantirFavoritos(usuario);
+
+  const favoritosAntes = usuario.favoritos.length;
+  usuario.favoritos = usuario.favoritos.filter(
+    (favorito: any) => String(favorito.idEstacao) !== estacaoId
+  );
+
+  if (favoritosAntes === usuario.favoritos.length) {
+    return res.status(404).json({ message: "Favorito não encontrado." });
+  }
+
+  salvarUsuarios(usuarios);
+  return res.status(200).json({ favoritos: usuario.favoritos });
+});
+
+// ---------------------- ROTA DE GERAÇÃO DE TRAJETO ----------------------
 import estacoes from "./estacoes.json" with { type: "json" };;
 
 // Função para normalizar texto (sem acento e minúsculo)

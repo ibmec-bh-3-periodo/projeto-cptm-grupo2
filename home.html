@@ -94,7 +94,7 @@ mapa.addEventListener('click', () => {
 
     async function carregarSaldo() {
       try {
-        const resposta = await fetch(`http://localhost:5501/usuarios/${idUsuario}`);
+        const resposta = await fetch(`/usuarios/${idUsuario}`);
         if (!resposta.ok) throw new Error('Erro ao buscar saldo');
         const usuarioAtualizado = await resposta.json();
 
@@ -118,7 +118,7 @@ mapa.addEventListener('click', () => {
     window.addEventListener('DOMContentLoaded', carregarSaldo);
 
     function abrirFaleConosco() {
-      window.open('http://localhost:5501/fale-conosco', '_blank');}
+      window.open('/fale-conosco', '_blank');}
   </script>
 </body>
 </html>

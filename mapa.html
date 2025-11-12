@@ -491,6 +491,78 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
+  const API_BASE_URL = "http://localhost:5501";
+  let usuarioLogado = JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuarioLogado) {
+    window.location.href = "login.html";
+  }
+
+  let favoritosUsuario = Array.isArray(usuarioLogado?.favoritos)
+    ? usuarioLogado.favoritos
+    : [];
+  let estacoesDisponiveisCache = null;
+
+  function sincronizarFavoritosLocal(favoritos) {
+    favoritosUsuario = Array.isArray(favoritos) ? favoritos : [];
+    if (usuarioLogado) {
+      usuarioLogado.favoritos = favoritosUsuario;
+      localStorage.setItem("usuario", JSON.stringify(usuarioLogado));
+    }
+  }
+
+  sincronizarFavoritosLocal(favoritosUsuario);
+
+  async function carregarFavoritosDoUsuario() {
+    if (!usuarioLogado) {
+      return [];
+    }
+
+    try {
+      const resposta = await fetch(`${API_BASE_URL}/usuarios/${usuarioLogado.id}/favoritos`);
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        throw new Error(dados.message || "Erro ao carregar favoritos");
+      }
+
+      sincronizarFavoritosLocal(dados.favoritos);
+    } catch (erro) {
+      console.error("Não foi possível atualizar os favoritos do usuário.", erro);
+    }
+
+    return favoritosUsuario;
+  }
+
+  async function carregarEstacoesDisponiveis() {
+    if (estacoesDisponiveisCache) {
+      return estacoesDisponiveisCache;
+    }
+
+    try {
+      const resposta = await fetch("src/estacoes.json");
+      if (!resposta.ok) {
+        throw new Error("Falha ao carregar estacoes.json");
+      }
+      estacoesDisponiveisCache = await resposta.json();
+    } catch (erro) {
+      console.error("Erro ao carregar a lista de estações", erro);
+      estacoesDisponiveisCache = [];
+    }
+
+    return estacoesDisponiveisCache;
+  }
+
+  function atualizarEstadoBotaoFavorito(nome, botao) {
+    if (!botao) return;
+    const estaFavorito = favoritosUsuario.some(
+      (favorito) => favorito?.nome === nome || String(favorito?.idEstacao) === nome
+    );
+    botao.classList.toggle("favorito-ativo", estaFavorito);
+  }
+
+  carregarFavoritosDoUsuario();
+
   // Criar o mapa
   var map = L.map('map', {
       crs: L.CRS.Simple,
@@ -560,17 +632,15 @@ const modal = document.getElementById("estacaoModal");
 const content = document.getElementById("modalContent");
 
 function mostrarModal(nome, linhas, descricao, corClasse, demanda) {
-  const favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
-  const isFavorito = favoritos.includes(nome);
-
   content.innerHTML = `
     <div class="modal-drag-handle"></div>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
       <div class="popup-titulo ${corClasse}" id="modal-nome">${nome}</div>
-      <button id="favorito-btn" class="favorito-btn ${isFavorito ? "favorito-ativo" : ""}" onclick="toggleFavorito('${nome}')"><svg xmlns="http://www.w3.org/2000/svg" class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
+      <button id="favorito-btn" class="favorito-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
-        </svg></button>
+        </svg>
+      </button>
     </div>
     <div class="popup-linhas">${linhas}</div>
     <div class="popup-status ${demanda.cor}">
@@ -579,6 +649,13 @@ function mostrarModal(nome, linhas, descricao, corClasse, demanda) {
     </div>
     <div class="popup-descricao">${descricao || ""}</div>
   `;
+
+  const botaoFavorito = document.getElementById("favorito-btn");
+  if (botaoFavorito) {
+    atualizarEstadoBotaoFavorito(nome, botaoFavorito);
+    botaoFavorito.addEventListener("click", () => toggleFavorito(nome, linhas));
+    carregarFavoritosDoUsuario().then(() => atualizarEstadoBotaoFavorito(nome, botaoFavorito));
+  }
 
   modal.style.transform = "translateY(0)";
   modal.classList.add("active");
@@ -851,7 +928,7 @@ document.getElementById("gerar-rota").addEventListener("click", async () => {
   }
 
   try {
-    const resp = await fetch(`http://localhost:5501/rota?orig=${origem}&dest=${destino}`);
+    const resp = await fetch(`/rota?orig=${origem}&dest=${destino}`);
     const dados = await resp.json();
 
     if (!dados.trajeto) {
@@ -916,21 +993,63 @@ document.getElementById("limpar-rota").addEventListener("click", () => {
   }
 });
 
-function toggleFavorito(nomeEstacao) {
-  let favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
-
-  const index = favoritos.indexOf(nomeEstacao);
-  const botao = document.getElementById("favorito-btn");
-
-  if (index !== -1) {
-    favoritos.splice(index, 1);
-    botao.classList.remove("favorito-ativo");
-  } else {
-    favoritos.push(nomeEstacao);
-    botao.classList.add("favorito-ativo");
+async function toggleFavorito(nomeEstacao, linhaEstacao) {
+  if (!usuarioLogado) {
+    mostrarToast("Faça login para salvar favoritos.", "warning");
+    return;
   }
 
-  localStorage.setItem("favoritos", JSON.stringify(favoritos));
+  const botao = document.getElementById("favorito-btn");
+  const favoritosAtuais = favoritosUsuario || [];
+  const favoritoExistente = favoritosAtuais.find(
+    (favorito) => favorito?.nome === nomeEstacao || String(favorito?.idEstacao) === nomeEstacao
+  );
+
+  const estacoes = await carregarEstacoesDisponiveis();
+  const estacaoEncontrada = estacoes.find((estacao) => estacao?.nome === nomeEstacao);
+  const idReferencia = favoritoExistente
+    ? favoritoExistente.idEstacao
+    : estacaoEncontrada
+    ? estacaoEncontrada.id
+    : nomeEstacao;
+  const idEstacao = String(idReferencia);
+
+  try {
+    let resposta;
+    if (favoritoExistente) {
+      resposta = await fetch(
+        `${API_BASE_URL}/usuarios/${usuarioLogado.id}/favoritos/${encodeURIComponent(idEstacao)}`,
+        { method: "DELETE" }
+      );
+    } else {
+      resposta = await fetch(`${API_BASE_URL}/usuarios/${usuarioLogado.id}/favoritos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idEstacao, nome: nomeEstacao, linha: linhaEstacao })
+      });
+    }
+
+    const dados = await resposta.json().catch(() => ({}));
+
+    if (!resposta.ok) {
+      throw new Error(dados.message || "Erro ao atualizar favoritos");
+    }
+
+    sincronizarFavoritosLocal(dados.favoritos);
+
+    if (botao) {
+      atualizarEstadoBotaoFavorito(nomeEstacao, botao);
+    }
+
+    if (favoritoExistente) {
+      mostrarToast("Favorito removido com sucesso!", "success");
+    } else {
+      mostrarToast("Estação adicionada aos favoritos!", "success");
+    }
+  } catch (erro) {
+    console.error("Erro ao atualizar favorito:", erro);
+    mostrarToast("Não foi possível atualizar os favoritos.", "error");
+  }
 }
 
 function abrirModalEstacao(nomeEstacao) {
@@ -941,12 +1060,8 @@ function abrirModalEstacao(nomeEstacao) {
   nome.textContent = nomeEstacao;
   modal.classList.add("show");
 
-  // Atualiza estado do coração
-  const favoritos = JSON.parse(localStorage.getItem("favoritos")) || [];
-  if (favoritos.includes(nomeEstacao)) {
-    botaoFavorito.classList.add("favorito-ativo");
-  } else {
-    botaoFavorito.classList.remove("favorito-ativo");
+  if (botaoFavorito) {
+    atualizarEstadoBotaoFavorito(nomeEstacao, botaoFavorito);
   }
 }
 
