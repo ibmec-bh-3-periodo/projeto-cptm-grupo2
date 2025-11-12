@@ -2,7 +2,11 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
-import henriqueRoutes from "./henrique";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import henriqueRoutes from "./henrique.js";
 
 const server = express();
 server.use(express.json());
@@ -223,7 +227,7 @@ server.get("/usuarios/:id", (req, res) => {
   return res.json(usuario);
 });
  // ---------------------- ROTA DE GERAÇÃO DE TRAJETO ----------------------
-import estacoes from "./estacoes.json";
+import estacoes from "./estacoes.json" with { type: "json" };;
 
 // Função para normalizar texto (sem acento e minúsculo)
 function normalizarTexto(texto: string): string {
