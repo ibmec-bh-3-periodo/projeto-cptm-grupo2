@@ -7,7 +7,7 @@ export interface HistoricoItem {
   }
   
   export interface Favorito {
-    idEstacao: number;   // ID da estação favorita
+    idEstacao: string;   // ID da estação favorita
     nome: string;        // Nome da estação
     linha: string;       // Linha correspondente
   }

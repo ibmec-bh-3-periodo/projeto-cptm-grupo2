@@ -100,6 +100,7 @@
   </main>
 
   <script>
+    const API_BASE_URL = 'http://localhost:5501';
     const btnAdd = document.getElementById('btnAdd');
     const btnRemove = document.getElementById('btnRemove');
     const modal = document.getElementById('modal-busca');
@@ -112,101 +113,132 @@
     const favListDinamicos = document.getElementById('favListDinamicos');
     const emptyState = document.getElementById('emptyState');
 
-    let linhasDisponiveis = [];
+    let usuario = JSON.parse(localStorage.getItem('usuario'));
+
+    if (!usuario) {
+      alert('Nenhum usuário logado. Faça login novamente.');
+      window.location.href = 'login.html';
+    }
+
+    let favoritosAtuais = Array.isArray(usuario?.favoritos) ? usuario.favoritos : [];
 
     function syncEmpty() {
       emptyState.hidden = favListDinamicos.children.length > 0;
     }
 
-    fetch('./assets/data/linhas.json')
-      .then(res => res.json())
-      .then(linhas => {
-        linhasDisponiveis = linhas;
-      });
-
-    function linhaJaFavoritada(nome) {
-      const cards = document.querySelectorAll('.card h3');
-      return Array.from(cards).some(card => card.textContent.trim() === nome);
+    function obterCorLinha(linha) {
+      if (!linha) return '#9ca3af';
+      const texto = linha.toLowerCase();
+      if (texto.includes('rubi')) return '#8c2b61';
+      if (texto.includes('diamante')) return '#6e6e6e';
+      if (texto.includes('esmeralda')) return '#007e63';
+      if (texto.includes('turquesa')) return '#458797';
+      if (texto.includes('coral')) return '#bf4124';
+      if (texto.includes('safira')) return '#1c146b';
+      if (texto.includes('jade')) return '#038c3e';
+      return '#9ca3af';
     }
 
-    function montarCarrossel(linhas) {
-      modalCarrossel.innerHTML = '';
-      const filtradas = linhas.filter(linha => !linhaJaFavoritada(linha.nome));
-      if (filtradas.length === 0) {
-        modalCarrossel.innerHTML = '<p style="text-align:center; color:#444;">Todas as linhas já foram adicionadas.</p>';
-        return;
-      }
+    function criarCardFavorito(favorito) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      const cor = obterCorLinha(favorito.linha);
+      const subtitulo = favorito.linha || 'Favorito salvo no mapa';
 
-      filtradas.forEach(linha => {
-        const card = document.createElement('div');
-        card.className = 'linha-card';
-        card.dataset.nome = linha.nome.toLowerCase();
+      card.innerHTML = `
+        <div class="esq">
+          <div class="pill" style="background-color: ${cor}">
+            <img src="./assets/img/train.svg" alt="${favorito.nome}">
+          </div>
+          <div class="info">
+            <h3>${favorito.nome}</h3>
+            <p>${subtitulo}</p>
+          </div>
+        </div>
+        <button class="line-action" style="background-color: ${cor}" title="Ver no mapa">
+          <img src="./assets/play_arrow.svg" alt="Abrir">
+        </button>
+      `;
 
-        const cor = document.createElement('div');
-        cor.className = 'cor-bolinha';
-        cor.style.backgroundColor = linha.cor;
-
-        const texto = document.createElement('span');
-        texto.textContent = linha.nome;
-
-        card.appendChild(cor);
-        card.appendChild(texto);
-        modalCarrossel.appendChild(card);
-
-        card.addEventListener('click', () => {
-          const favorito = document.createElement('article');
-          favorito.className = 'card';
-          favorito.innerHTML = `
-            <div class="esq">
-              <div class="pill" style="background-color: ${linha.cor}">
-                <img src="./assets/img/train.svg" alt="${linha.nome}">
-              </div>
-              <div class="info">
-                <h3>${linha.nome}</h3>
-                <p>Adicionado agora</p>
-              </div>
-            </div>
-            <button class="line-action" style="background-color: ${linha.cor}" title="Abrir">
-              <img src="./assets/play_arrow.svg" alt="Abrir">
-            </button>
-          `;
-          favListDinamicos.appendChild(favorito);
-          syncEmpty();
-          modal.style.display = 'none';
-          modalInput.value = '';
-          montarCarrossel(linhasDisponiveis);
-        });
+      card.querySelector('.line-action')?.addEventListener('click', () => {
+        window.location.href = 'mapa.html';
       });
+
+      return card;
+    }
+
+    function renderizarFavoritos() {
+      favListDinamicos.innerHTML = '';
+      favoritosAtuais.forEach(favorito => {
+        favListDinamicos.appendChild(criarCardFavorito(favorito));
+      });
+      syncEmpty();
+    }
+
+    async function carregarFavoritos() {
+      if (!usuario) return;
+      try {
+        const resposta = await fetch(`${API_BASE_URL}/usuarios/${usuario.id}/favoritos`);
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+          throw new Error(dados.message || 'Erro ao carregar favoritos.');
+        }
+
+        favoritosAtuais = Array.isArray(dados.favoritos) ? dados.favoritos : [];
+        usuario.favoritos = favoritosAtuais;
+        localStorage.setItem('usuario', JSON.stringify(usuario));
+        renderizarFavoritos();
+      } catch (erro) {
+        console.error('Erro ao carregar favoritos', erro);
+        favListDinamicos.innerHTML = '<p style="color:#d00; text-align:center;">Não foi possível carregar seus favoritos agora.</p>';
+        emptyState.hidden = true;
+      }
+    }
+
+    async function removerFavorito(idEstacao) {
+      if (!usuario) return;
+
+      try {
+        const resposta = await fetch(`${API_BASE_URL}/usuarios/${usuario.id}/favoritos/${encodeURIComponent(idEstacao)}`, {
+          method: 'DELETE'
+        });
+        const dados = await resposta.json().catch(() => ({}));
+
+        if (!resposta.ok) {
+          throw new Error(dados.message || 'Erro ao remover favorito.');
+        }
+
+        favoritosAtuais = Array.isArray(dados.favoritos) ? dados.favoritos : [];
+        usuario.favoritos = favoritosAtuais;
+        localStorage.setItem('usuario', JSON.stringify(usuario));
+        renderizarFavoritos();
+        modalRemover.style.display = 'none';
+        modalRemoverCarrossel.innerHTML = '';
+      } catch (erro) {
+        console.error('Erro ao remover favorito', erro);
+        alert('Não foi possível remover o favorito. Tente novamente.');
+      }
     }
 
     function montarCarrosselRemover() {
       modalRemoverCarrossel.innerHTML = '';
-      const favoritos = favListDinamicos.querySelectorAll('.card');
 
-      if (favoritos.length === 0) {
+      if (!favoritosAtuais.length) {
         modalRemoverCarrossel.innerHTML = '<p style="text-align:center; color:#444;">Nenhum favorito para remover.</p>';
         return;
       }
 
-      favoritos.forEach(card => {
-        const nome = card.querySelector('h3')?.textContent.trim();
-        const cor = card.querySelector('.pill')?.style.backgroundColor || '#ccc';
-
+      favoritosAtuais.forEach(favorito => {
+        const cor = obterCorLinha(favorito.linha);
         const item = document.createElement('div');
         item.className = 'linha-card';
         item.innerHTML = `
           <div class="cor-bolinha" style="background-color: ${cor}"></div>
-          <span>${nome}</span>
+          <span>${favorito.nome}</span>
         `;
 
-        item.addEventListener('click', () => {
-          card.remove();
-          syncEmpty();
-          modalRemover.style.display = 'none';
-          modalRemoverCarrossel.innerHTML = '';
-          montarCarrossel(linhasDisponiveis);
-        });
-
+        item.addEventListener('click', () => removerFavorito(favorito.idEstacao));
         modalRemoverCarrossel.appendChild(item);
       });
     }
@@ -214,8 +246,8 @@
     btnAdd.addEventListener('click', () => {
       modal.style.display = 'flex';
       modalInput.value = '';
-      montarCarrossel(linhasDisponiveis);
-      modalInput.focus();
+      modalInput.disabled = true;
+      modalCarrossel.innerHTML = '<p style="text-align:center; color:#444;">Adicione novos favoritos diretamente pelo mapa interativo.</p>';
     });
 
     btnRemove.addEventListener('click', () => {
@@ -224,25 +256,18 @@
     });
 
     fecharModal.addEventListener('click', () => {
-    modal.style.display = 'none';
-    modalInput.value = '';
-    modalCarrossel.innerHTML = '';
-  });
+      modal.style.display = 'none';
+      modalInput.value = '';
+      modalCarrossel.innerHTML = '';
+    });
 
-  fecharModalRemover.addEventListener('click', () => {
-    modalRemover.style.display = 'none';
-    modalRemoverCarrossel.innerHTML = '';
-  });
+    fecharModalRemover.addEventListener('click', () => {
+      modalRemover.style.display = 'none';
+      modalRemoverCarrossel.innerHTML = '';
+    });
 
-  modalInput.addEventListener('input', () => {
-    const termo = modalInput.value.toLowerCase();
-    const filtradas = linhasDisponiveis.filter(linha =>
-      linha.nome.toLowerCase().includes(termo) && !linhaJaFavoritada(linha.nome)
-    );
-    montarCarrossel(filtradas);
-  });
-
-  syncEmpty();
-</script>
+    window.addEventListener('DOMContentLoaded', carregarFavoritos);
+    renderizarFavoritos();
+  </script>
 </body>
 </html>
