@@ -519,7 +519,7 @@
     }
 
     try {
-      const resposta = await fetch(`${API_BASE_URL}/usuarios/${usuarioLogado.id}/favoritos`);
+      const resposta = await fetch(`/usuarios/${usuarioLogado.id}/favoritos`);
       const dados = await resposta.json();
 
       if (!resposta.ok) {
@@ -1018,11 +1018,11 @@ async function toggleFavorito(nomeEstacao, linhaEstacao) {
     let resposta;
     if (favoritoExistente) {
       resposta = await fetch(
-        `${API_BASE_URL}/usuarios/${usuarioLogado.id}/favoritos/${encodeURIComponent(idEstacao)}`,
+        `/usuarios/${usuarioLogado.id}/favoritos/${encodeURIComponent(idEstacao)}`,
         { method: "DELETE" }
       );
     } else {
-      resposta = await fetch(`${API_BASE_URL}/usuarios/${usuarioLogado.id}/favoritos`, {
+      resposta = await fetch(`/usuarios/${usuarioLogado.id}/favoritos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idEstacao, nome: nomeEstacao, linha: linhaEstacao })
