@@ -178,7 +178,7 @@
     async function carregarFavoritos() {
       if (!usuario) return;
       try {
-        const resposta = await fetch(`${API_BASE_URL}/usuarios/${usuario.id}/favoritos`);
+        const resposta = await fetch(`/usuarios/${usuario.id}/favoritos`);
         const dados = await resposta.json();
 
         if (!resposta.ok) {
@@ -200,7 +200,7 @@
       if (!usuario) return;
 
       try {
-        const resposta = await fetch(`${API_BASE_URL}/usuarios/${usuario.id}/favoritos/${encodeURIComponent(idEstacao)}`, {
+        const resposta = await fetch(`/usuarios/${usuario.id}/favoritos/${encodeURIComponent(idEstacao)}`, {
           method: 'DELETE'
         });
         const dados = await resposta.json().catch(() => ({}));

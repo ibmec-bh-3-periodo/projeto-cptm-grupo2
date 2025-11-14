@@ -268,7 +268,7 @@
 
     async function carregarSaldo() {
       try {
-        const resposta = await fetch(`http://localhost:5501/usuarios/${idUsuario}`);
+        const resposta = await fetch(`/usuarios/${idUsuario}`);
         if (!resposta.ok) throw new Error("Erro ao buscar saldo");
         const usuarioAtualizado = await resposta.json();
         valorSaldo.textContent = formatarReal(usuarioAtualizado.saldo);
@@ -320,7 +320,7 @@
       }
 
       try {
-        const resposta = await fetch(`http://localhost:5501/usuarios/${idUsuario}/saldo`, {
+        const resposta = await fetch(`/usuarios/${idUsuario}/saldo`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ valor: valorAdicionar })
